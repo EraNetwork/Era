@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>463</height>
+    <width>774</width>
+    <height>455</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,13 +39,16 @@
     <enum>QLayout::SetMaximumSize</enum>
    </property>
    <property name="leftMargin">
-    <number>21</number>
+    <number>9</number>
    </property>
    <property name="topMargin">
     <number>10</number>
    </property>
    <property name="rightMargin">
-    <number>10</number>
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item row="1" column="0">
     <widget class="QWidget" name="widget" native="true">
@@ -104,11 +107,11 @@
        <rect>
         <x>0</x>
         <y>30</y>
-        <width>601</width>
-        <height>441</height>
+        <width>741</width>
+        <height>391</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayoutBE" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="0,0">
+      <layout class="QGridLayout" name="gridLayoutBE" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="1,2">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
@@ -267,7 +270,7 @@
        <item row="1" column="1">
         <widget class="QPushButton" name="blockButton">
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 175, 0);</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Jump to Block</string>
@@ -290,7 +293,7 @@
        <item row="13" column="1">
         <widget class="QPushButton" name="txButton">
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 175, 0);</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Decode Transaction</string>

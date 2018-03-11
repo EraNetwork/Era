@@ -35,7 +35,7 @@ TransactionView::TransactionView(QWidget *parent) :
     setContentsMargins(0,0,0,0);
 
     QHBoxLayout *hlayout = new QHBoxLayout();
-    hlayout->setContentsMargins(0,0,0,0);
+    hlayout->setContentsMargins(0,0,0,10);
 #ifdef Q_OS_MAC
     hlayout->setSpacing(5);
     hlayout->addSpacing(26);
@@ -107,7 +107,7 @@ TransactionView::TransactionView(QWidget *parent) :
     vlayout->addLayout(hlayout);
     vlayout->addWidget(createDateRangeWidget());
     vlayout->addWidget(view);
-    vlayout->setSpacing(0);
+    vlayout->setSpacing(2);
     int width = view->verticalScrollBar()->sizeHint().width();
     // Cover scroll bar width with spacing
 #ifdef Q_OS_MAC
@@ -119,6 +119,7 @@ TransactionView::TransactionView(QWidget *parent) :
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     view->setTabKeyNavigation(false);
     view->setContextMenuPolicy(Qt::CustomContextMenu);
+    view->setShowGrid(false);
 
     transactionView = view;
 

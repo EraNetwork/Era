@@ -316,13 +316,13 @@
          </property>
         </widget>
        </item>
-<item row="14" column="1">
+       <item row="14" column="1">
         <widget class="QPushButton" name="openConfigurationfileButton">
          <property name="toolTip">
           <string>Open the Era configuration file from the current data directory.</string>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 175, 0);</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>O&amp;pen</string>

@@ -14,13 +14,13 @@ static const int STATUSBAR_ICONSIZE = 16;
 #define STYLE_INVALID "background:#FF8080"
 
 /* Transaction list -- unconfirmed transaction */
-#define COLOR_UNCONFIRMED QColor(128, 128, 128)
+#define COLOR_UNCONFIRMED QColor(130, 124, 161)
 /* Transaction list -- positive amount */
-#define COLOR_POSITIVE QColor("green")
+#define COLOR_POSITIVE QColor(37, 131, 27)
 /* Transaction list -- negative amount */
 #define COLOR_NEGATIVE QColor("red")
 /* Transaction list -- bare address (without label) */
-#define COLOR_BAREADDRESS QColor(140, 140, 140)
+#define COLOR_BAREADDRESS QColor(130, 124, 161)
 
 /* Tooltips longer than this (in characters) are converted into rich text,
    so that they can be word-wrapped.

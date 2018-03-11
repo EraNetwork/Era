@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>850</width>
-    <height>400</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <property name="bottomMargin">
-    <number>8</number>
+    <number>9</number>
    </property>
    <item>
     <widget class="QFrame" name="frameCoinControl">
@@ -39,7 +39,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayoutCoinControl2">
       <property name="spacing">
-       <number>-1</number>
+       <number>6</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -59,10 +59,10 @@
          <number>0</number>
         </property>
         <property name="leftMargin">
-         <number>10</number>
+         <number>0</number>
         </property>
         <property name="topMargin">
-         <number>10</number>
+         <number>0</number>
         </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayoutCoinControl1">
@@ -173,7 +173,16 @@
            <string notr="true"/>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayoutCoinControl5">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -529,19 +538,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditCoinControlChange">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QLabel" name="labelCoinControlChangeLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -560,6 +556,19 @@
             </property>
             <property name="margin">
              <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditCoinControlChange">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
            </widget>
           </item>
@@ -594,11 +603,20 @@
         <x>0</x>
         <y>0</y>
         <width>830</width>
-        <height>165</height>
+        <height>180</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -629,13 +647,25 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="addButton">
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="toolTip">
         <string>Send to multiple recipients at once</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Add &amp;Recipient</string>
        </property>
        <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
         <bool>false</bool>
        </property>
       </widget>
@@ -728,10 +758,6 @@
        <property name="text">
         <string>S&amp;end</string>
        </property>
-       <property name="icon">
-        <iconset resource="../era.qrc">
-         <normaloff>:/icons/send</normaloff>:/icons/send</iconset>
-       </property>
        <property name="default">
         <bool>true</bool>
        </property>
@@ -741,8 +767,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../era.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -83,6 +83,7 @@ EraGUI::EraGUI(QWidget *parent):
 {
     resize(850+95, 550);
     setWindowTitle(tr("Era") + " - " + tr("Wallet"));
+//    setStyleSheet("background-color: white;");
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/era"));
     setWindowIcon(QIcon(":icons/era"));
@@ -125,6 +126,7 @@ EraGUI::EraGUI(QWidget *parent):
     blockbrowser = new BlockBrowser();
 
     centralStackedWidget = new QStackedWidget(this);
+    centralStackedWidget->setContentsMargins(0,15,0,0);
     centralStackedWidget->addWidget(overviewPage);
     centralStackedWidget->addWidget(transactionsPage);
     centralStackedWidget->addWidget(addressBookPage);
@@ -177,26 +179,12 @@ EraGUI::EraGUI(QWidget *parent):
     }
 
     // Progress bar and label for blocks download
-    progressBarLabel = new QLabel();
-    progressBarLabel->setVisible(false);
     progressBar = new QProgressBar();
     progressBar->setAlignment(Qt::AlignCenter);
     progressBar->setVisible(false);
-
-    if (!fUseBlackTheme)
-    {
-        // Override style sheet for progress bar for styles that have a segmented progress bar,
-        // as they make the text unreadable (workaround for issue #1071)
-        // See https://qt-project.org/doc/qt-4.8/gallery.html
-        QString curStyle = qApp->style()->metaObject()->className();
-        if(curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle")
-        {
-            progressBar->setStyleSheet("QProgressBar { background-color: #e8e8e8; border: 1px solid grey; border-radius: 7px; padding: 1px; text-align: center; } QProgressBar::chunk { background: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #FF8000, stop: 1 orange); border-radius: 7px; margin: 0px; }");
-        }
-    }
-
-    statusBar()->addWidget(progressBarLabel);
-    statusBar()->addWidget(progressBar);
+    statusBar()->setStyleSheet("margin: 0px; padding: 0px; border: none;");
+    statusBar()->setSizeGripEnabled(false);
+    statusBar()->addWidget(progressBar, 1);
 
     syncIconMovie = new QMovie(fUseBlackTheme ? ":/movies/update_spinner_black" : ":/movies/update_spinner", "mng", this);
 
@@ -233,31 +221,31 @@ void EraGUI::createActions()
 {
     QActionGroup *tabGroup = new QActionGroup(this);
 
-    overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Dashboard"), this);
+    overviewAction = new QAction(QIcon(":/icons/blockbrowser"), tr("&Dashboard"), this);
     overviewAction->setToolTip(tr("Show general overview of wallet"));
     overviewAction->setCheckable(true);
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
     tabGroup->addAction(overviewAction);
 
-    receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Receive"), this);
+    receiveCoinsAction = new QAction(QIcon(":/icons/blockbrowser"), tr("&Receive"), this);
     receiveCoinsAction->setToolTip(tr("Show the list of addresses for receiving payments"));
     receiveCoinsAction->setCheckable(true);
     receiveCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
     tabGroup->addAction(receiveCoinsAction);
 
-    sendCoinsAction = new QAction(QIcon(":/icons/send"), tr("&Send"), this);
+    sendCoinsAction = new QAction(QIcon(":/icons/blockbrowser"), tr("&Send"), this);
     sendCoinsAction->setToolTip(tr("Send coins to a Era address"));
     sendCoinsAction->setCheckable(true);
     sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
     tabGroup->addAction(sendCoinsAction);
 
-    historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
+    historyAction = new QAction(QIcon(":/icons/blockbrowser"), tr("&Transactions"), this);
     historyAction->setToolTip(tr("Browse transaction history"));
     historyAction->setCheckable(true);
     historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
     tabGroup->addAction(historyAction);
 
-    addressBookAction = new QAction(QIcon(":/icons/address-book"), tr("&Address Book"), this);
+    addressBookAction = new QAction(QIcon(":/icons/blockbrowser"), tr("&Address Book"), this);
     addressBookAction->setToolTip(tr("Edit the list of stored addresses and labels"));
     addressBookAction->setCheckable(true);
     addressBookAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
@@ -364,7 +352,7 @@ static QWidget* makeToolBarSpacer()
 {
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    spacer->setStyleSheet(fUseBlackTheme ? "QWidget { background: rgb(30,32,36); }" : "QWidget { background: none; }");
+    spacer->setStyleSheet(fUseBlackTheme ? "QWidget { background: none; }" : "QWidget { background: none; }");
     return spacer;
 }
 
@@ -373,17 +361,13 @@ void EraGUI::createToolBars()
     toolbar = new QToolBar(tr("Tabs toolbar"));
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
+    toolbar->setMinimumSize(160, 130);
+    toolbar->setContentsMargins(0,0,0,15);
 
-    if (fUseBlackTheme)
-    {
-        QWidget* header = new QWidget();
-        header->setMinimumSize(160, 130);
-        header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        header->setStyleSheet("QWidget { background-color: rgb(24,26,30); background-repeat: no-repeat; background-image: url(:/images/header); background-position: top center; }");
-        toolbar->addWidget(header);
-        toolbar->addWidget(makeToolBarSpacer());
-    }
-
+    QWidget* header = new QWidget();
+    header->setMinimumSize(160, 50);
+    header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    toolbar->addWidget(header);
     toolbar->addAction(overviewAction);
     toolbar->addAction(receiveCoinsAction);
     toolbar->addAction(sendCoinsAction);
@@ -398,7 +382,7 @@ void EraGUI::createToolBars()
 
     addToolBar(Qt::LeftToolBarArea, toolbar);
 
-    int w = 0;
+    int w = 160;
 
     foreach(QAction *action, toolbar->actions()) {
         w = std::max(w, toolbar->widgetForAction(action)->width());
@@ -585,7 +569,6 @@ void EraGUI::setNumBlocks(int count)
 
         overviewPage->showOutOfSyncWarning(false);
 
-        progressBarLabel->setVisible(false);
         progressBar->setVisible(false);
     }
     else
@@ -615,9 +598,8 @@ void EraGUI::setNumBlocks(int count)
             timeBehindText = tr("%1 and %2").arg(tr("%n year(s)", "", years)).arg(tr("%n week(s)","", remainder/WEEK_IN_SECONDS));
         }
 
-        progressBarLabel->setText(tr(clientModel->isImporting() ? "Importing blocks..." : "Synchronizing with network..."));
-        progressBarLabel->setVisible(true);
-        progressBar->setFormat(tr("%1 behind").arg(timeBehindText));
+        //progressBarLabel->setText(tr(clientModel->isImporting() ? "Importing blocks..." : "Synchronizing with network..."));
+        progressBar->setFormat(tr(clientModel->isImporting() ? "Importing blocks..." : "Synchronizing with network...") + " " + tr("%1 behind").arg(timeBehindText));
         progressBar->setMaximum(totalSecs);
         progressBar->setValue(totalSecs - secs);
         progressBar->setVisible(true);
@@ -641,7 +623,6 @@ void EraGUI::setNumBlocks(int count)
     tooltip = QString("<nobr>") + tooltip + QString("</nobr>");
 
     labelBlocksIcon->setToolTip(tooltip);
-    progressBarLabel->setToolTip(tooltip);
     progressBar->setToolTip(tooltip);
 
     statusBar()->setVisible(fShowStatusBar);
@@ -899,7 +880,7 @@ void EraGUI::setEncryptionStatus(int status)
     {
     case WalletModel::Unencrypted:
         labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_open" : ":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
-        labelEncryptionIcon->setToolTip(tr("Wallet is <b>not encrypted</b>"));
+        labelEncryptionIcon->setToolTip(tr("<nobr>Wallet is <b>not encrypted</b></nobr>"));
         changePassphraseAction->setEnabled(false);
         unlockWalletAction->setVisible(false);
         lockWalletAction->setVisible(false);

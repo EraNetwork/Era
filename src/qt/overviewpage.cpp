@@ -12,9 +12,10 @@
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
+#include <QFont >
 
-#define DECORATION_SIZE 64
-#define NUM_ITEMS 6
+#define DECORATION_SIZE 55
+#define NUM_ITEMS 3
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -30,14 +31,17 @@ public:
     {
         painter->save();
 
+        QFont font = painter->font();
+        font.setPointSize(14);
+
         QIcon icon = qvariant_cast<QIcon>(index.data(Qt::DecorationRole));
         QRect mainRect = option.rect;
-        QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
-        int xspace = DECORATION_SIZE + 8;
-        int ypad = 6;
+        QRect decorationRect(mainRect.topLeft(), QSize(32, 32));
+        int xspace = DECORATION_SIZE - 10;
+        int ypad = 0;
         int halfheight = (mainRect.height() - 2*ypad)/2;
         QRect amountRect(mainRect.left() + xspace, mainRect.top()+ypad, mainRect.width() - xspace, halfheight);
-        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight, mainRect.width() - xspace, halfheight);
+        QRect addressRect(mainRect.left() + xspace, mainRect.top()+ypad+halfheight-5, mainRect.width() - xspace, halfheight);
         icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
@@ -51,7 +55,7 @@ public:
             foreground = qvariant_cast<QColor>(value);
         }
 
-        painter->setPen(fUseBlackTheme ? QColor(255, 255, 255) : foreground);
+        painter->setPen(fUseBlackTheme ? QColor(255, 255, 255) : QColor(164,164,171));
         painter->drawText(addressRect, Qt::AlignLeft|Qt::AlignVCenter, address);
 
         if(amount < 0)
@@ -72,10 +76,11 @@ public:
         {
             amountText = QString("[") + amountText + QString("]");
         }
-        painter->drawText(amountRect, Qt::AlignRight|Qt::AlignVCenter, amountText);
+        //painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, amountText);
 
-        painter->setPen(fUseBlackTheme ? QColor(96, 101, 110) : option.palette.color(QPalette::Text));
-        painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
+        painter->setFont(font);
+        painter->setPen(fUseBlackTheme ? QColor(255, 255, 255) : option.palette.color(QPalette::Text));
+        painter->drawText(amountRect, Qt::AlignLeft|Qt::AlignVCenter, amountText + " at " + GUIUtil::dateTimeStr(date));
 
         painter->restore();
     }
