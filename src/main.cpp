@@ -10,6 +10,7 @@
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "db.h"
+#include "fork.h"
 #include "init.h"
 #include "kernel.h"
 #include "net.h"
@@ -956,6 +957,9 @@ void static PruneOrphanBlocks()
 // miner's coin base reward
 int64_t GetProofOfWorkReward(int64_t nHeight, int64_t nFees)
 {
+    int64_t nCurrentBlockHeight = pindexBest->nHeight; // Latest block height
+    int64_t nHalvingBlockHeight = 0;
+    int64_t nHalvingBlockRate   = 161280; // ~ 2 Months
     int64_t nSubsidy = 0 * COIN; // Initializing Subsidy
 
     if(nHeight == 4)
@@ -966,6 +970,13 @@ int64_t GetProofOfWorkReward(int64_t nHeight, int64_t nFees)
     else if(nHeight > 5)
     {
         nSubsidy = 10 * COIN;
+
+        // Halving PoW Subsidy
+        if(nCurrentBlockHeight > nUpgrade_01)
+        {
+            nHalvingBlockHeight = nCurrentBlockHeight - nUpgrade_01;
+            nSubsidy >>= (nHalvingBlockHeight / nHalvingBlockRate);
+        }
     }
 
     LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d\n", FormatMoney(nSubsidy), nSubsidy);
@@ -975,7 +986,7 @@ int64_t GetProofOfWorkReward(int64_t nHeight, int64_t nFees)
     {
         nSubsidy = 0;
         LogPrint("MINEOUT", "GetProofOfStakeReward(): create=%s nFees=%d\n", FormatMoney(nFees), nFees);
-        return nSubsidy + nFees;
+        return nFees;
     }
     return nSubsidy + nFees;
 }
@@ -991,7 +1002,7 @@ int64_t GetProofOfStakeReward(const CBlockIndex* pindexPrev, int64_t nCoinAge, i
     {
         nSubsidy = 0;
         LogPrint("MINEOUT", "GetProofOfStakeReward(): create=%s nFees=%d\n", FormatMoney(nFees), nFees);
-        return nSubsidy + nFees;
+        return nFees;
     }
 
     return nSubsidy + nFees;
@@ -1018,49 +1029,53 @@ unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfS
     int64_t PastBlocksMax = 24;
     int64_t CountBlocks = 0;
     int64_t nTargetSpacing = GetTargetSpacing(pindexLast->nHeight);
+    int64_t nCurrentBlockHeight = pindexBest->nHeight;
     CBigNum PastDifficultyAverage;
     CBigNum PastDifficultyAveragePrev;
 
-            if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMax) {
-                return nProofOfWorkLimit.GetCompact();
-            }
+    // Reset difficulty during halving fork
+    if (nCurrentBlockHeight == nUpgrade_01) { return nProofOfWorkLimit.GetCompact(); }
 
-            for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-                if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
-                CountBlocks++;
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || BlockLastSolved->nHeight < PastBlocksMax) {
+        return nProofOfWorkLimit.GetCompact();
+    }
 
-                if(CountBlocks <= PastBlocksMin) {
-                    if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
-                    else { PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (CBigNum().SetCompact(BlockReading->nBits))) / (CountBlocks + 1); }
-                    PastDifficultyAveragePrev = PastDifficultyAverage;
-                }
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
+        if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
+        CountBlocks++;
 
-                if(LastBlockTime > 0){
-                    int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
-                    nActualTimespan += Diff;
-                }
-                LastBlockTime = BlockReading->GetBlockTime();
-                BlockReading = GetLastBlockIndex(BlockReading->pprev, fProofOfStake);
-            }
+        if(CountBlocks <= PastBlocksMin) {
+            if (CountBlocks == 1) { PastDifficultyAverage.SetCompact(BlockReading->nBits); }
+            else { PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (CBigNum().SetCompact(BlockReading->nBits))) / (CountBlocks + 1); }
+            PastDifficultyAveragePrev = PastDifficultyAverage;
+        }
 
-            CBigNum bnNew(PastDifficultyAverage);
+        if(LastBlockTime > 0){
+            int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
+            nActualTimespan += Diff;
+        }
+        LastBlockTime = BlockReading->GetBlockTime();
+        BlockReading = GetLastBlockIndex(BlockReading->pprev, fProofOfStake);
+    }
 
-            int64_t _nTargetTimespan = CountBlocks * nTargetSpacing;
+    CBigNum bnNew(PastDifficultyAverage);
 
-            if (nActualTimespan < _nTargetTimespan/3)
-                nActualTimespan = _nTargetTimespan/3;
-            if (nActualTimespan > _nTargetTimespan*3)
-                nActualTimespan = _nTargetTimespan*3;
+    int64_t _nTargetTimespan = CountBlocks * nTargetSpacing;
 
-            // Retarget
-            bnNew *= nActualTimespan;
-            bnNew /= _nTargetTimespan;
+    if (nActualTimespan < _nTargetTimespan/3)
+        nActualTimespan = _nTargetTimespan/3;
+    if (nActualTimespan > _nTargetTimespan*3)
+        nActualTimespan = _nTargetTimespan*3;
 
-            if (bnNew > nProofOfWorkLimit){
-                bnNew = nProofOfWorkLimit;
-            }
+    // Retarget
+    bnNew *= nActualTimespan;
+    bnNew /= _nTargetTimespan;
 
-            return bnNew.GetCompact();
+    if (bnNew > nProofOfWorkLimit){
+        bnNew = nProofOfWorkLimit;
+    }
+
+    return bnNew.GetCompact();
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
