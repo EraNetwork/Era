@@ -1,4 +1,5 @@
-// Copyright (c) 2009-2018 The Era developers
+// Copyright (c) 2009-2012 The Bitcoin developers
+// Copyright (c) 2017-2018 The Era developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -150,13 +151,12 @@ public:
 
     void SetSecretBytes(const unsigned char vch[32]) {
         bool ret;
-        BIGNUM bn;
-        BN_init(&bn);
-        ret = BN_bin2bn(vch, 32, &bn);
+        BIGNUM *bn = BN_new();
+        ret = BN_bin2bn(vch, 32, bn);
         assert(ret);
-        ret = EC_KEY_regenerate_key(pkey, &bn);
+        ret = EC_KEY_regenerate_key(pkey, bn);
         assert(ret);
-        BN_clear_free(&bn);
+        BN_clear_free(bn);
     }
 
     void GetPrivKey(CPrivKey &privkey, bool fCompressed) {
@@ -228,10 +228,20 @@ public:
     }
 
     bool Verify(const uint256 &hash, const std::vector<unsigned char>& vchSig) {
-        // -1 = error, 0 = bad sig, 1 = good
-        if (ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), &vchSig[0], vchSig.size(), pkey) != 1)
-            return false;
-        return true;
+             // New versions of OpenSSL will reject non-canonical DER signatures. de/re-serialize first.
+            unsigned char *norm_der = NULL;
+            ECDSA_SIG *norm_sig = ECDSA_SIG_new();
+            const unsigned char* sigptr = &vchSig[0];
+            d2i_ECDSA_SIG(&norm_sig, &sigptr, vchSig.size());
+            int derlen = i2d_ECDSA_SIG(norm_sig, &norm_der);
+            ECDSA_SIG_free(norm_sig);
+            if (derlen <= 0)
+                return false;
+
+            // -1 = error, 0 = bad sig, 1 = good
+            bool ret = ECDSA_verify(0, (unsigned char*)&hash, sizeof(hash), norm_der, derlen, pkey) == 1;
+            OPENSSL_free(norm_der);
+            return ret;
     }
 
     bool SignCompact(const uint256 &hash, unsigned char *p64, int &rec) {
