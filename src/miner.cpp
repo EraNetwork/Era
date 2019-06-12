@@ -7,7 +7,7 @@
 #include "txdb.h"
 #include "miner.h"
 #include "kernel.h"
-#include "hmq1725/hashblock.h"
+#include "crypto/hmq/hmq1725.h"
 
 using namespace std;
 
@@ -73,7 +73,7 @@ public:
 uint64_t nLastBlockTx = 0;
 uint64_t nLastBlockSize = 0;
 int64_t nLastCoinStakeSearchInterval = 0;
- 
+
 // We want to sort transactions by fee, so:
 typedef boost::tuple<double, CTransaction*> TxPriority;
 class TxPriorityCompare

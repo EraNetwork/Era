@@ -123,29 +123,29 @@ OBJS= \
     obj/noui.o \
     obj/kernel.o \
     obj/pbkdf2.o \
-    obj/scrypt.o \
-    obj/scrypt-arm.o \
-    obj/scrypt-x86.o \
-    obj/scrypt-x86_64.o \
+    obj/crypto/scrypt/scrypt.o \
+    obj/crypto/scrypt/scrypt-arm.o \
+    obj/crypto/scrypt/scrypt-x86.o \
+    obj/crypto/scrypt/scrypt-x86_64.o \
     obj/chainparams.o \
-    obj/hmq1725/blake.o\
-    obj/hmq1725/bmw.o\
-    obj/hmq1725/groestl.o\
-    obj/hmq1725/jh.o\
-    obj/hmq1725/keccak.o\
-    obj/hmq1725/skein.o\
-    obj/hmq1725/cubehash.o \
-    obj/hmq1725/luffa.o \
-    obj/hmq1725/aes_helper.o \
-    obj/hmq1725/echo.o \
-    obj/hmq1725/shavite.o \
-    obj/hmq1725/simd.o \
-    obj/hmq1725/hamsi.o \
-    obj/hmq1725/fugue.o \
-    obj/hmq1725/shabal.o \
-    obj/hmq1725/whirlpool.o \
-    obj/hmq1725/haval.o \
-    obj/hmq1725/sha2big.o
+    obj/crypto/common/blake.o\
+    obj/crypto/common/bmw.o\
+    obj/crypto/common/groestl.o\
+    obj/crypto/common/jh.o\
+    obj/crypto/common/keccak.o\
+    obj/crypto/common/skein.o\
+    obj/crypto/common/cubehash.o \
+    obj/crypto/common/luffa.o \
+    obj/crypto/common/aes_helper.o \
+    obj/crypto/common/echo.o \
+    obj/crypto/common/shavite.o \
+    obj/crypto/common/simd.o \
+    obj/crypto/common/hamsi.o \
+    obj/crypto/common/fugue.o \
+    obj/crypto/common/shabal.o \
+    obj/crypto/common/whirlpool.o \
+    obj/crypto/common/haval.o \
+    obj/crypto/common/sha2big.o
 
 ifeq (${USE_WALLET}, 1)
     DEFS += -DENABLE_WALLET
@@ -177,13 +177,13 @@ obj/build.h: FORCE
 version.cpp: obj/build.h
 DEFS += -DHAVE_BUILD_INFO
 
-obj/scrypt-x86.o: scrypt-x86.S
+obj/crypto/scrypt/scrypt-x86.o: scrypt-x86.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
-obj/scrypt-x86_64.o: scrypt-x86_64.S
+obj/crypto/scrypt/scrypt-x86_64.o: scrypt-x86_64.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
-obj/scrypt-arm.o: scrypt-arm.S
+obj/crypto/scrypt/scrypt-arm.o: scrypt-arm.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
 obj/%.o: %.cpp

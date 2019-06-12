@@ -7,7 +7,7 @@
 
 #include "kernel.h"
 #include "txdb.h"
-#include "hmq1725/hashblock.h"
+#include "crypto/hmq/hmq1725.h"
 
 using namespace std;
 

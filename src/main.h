@@ -10,9 +10,9 @@
 #include "sync.h"
 #include "txmempool.h"
 #include "net.h"
-#include "hmq1725/hashblock.h"
+#include "crypto/hmq/hmq1725.h"
 //#include "script.h"
-//#include "scrypt.h"
+//#include "crypto/scrypt/scrypt.h"
 
 #include <limits>
 #include <list>
