@@ -1,0 +1,25 @@
+src/*.exe
+src/erad
+src/build.h
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.era
+#compilation and Qt preprocessor part
+*.qm
+Makefile
+era-qt
+build
+.qmake.stash
+#resources cpp
+qrc_*.cpp
+#qt creator
+*.pro.user
+#mac specific
+.DS_Store
+
+!src/leveldb/Makefile
