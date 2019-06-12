@@ -2,27 +2,17 @@ TEMPLATE = app
 TARGET = era-qt
 VERSION = 1.0.1.1
 INCLUDEPATH += src src/json src/qt
-QT += core gui widgets network
+QT += core gui network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 DEFINES += ENABLE_WALLET
 DEFINES += QT_GUI BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
 CONFIG += no_include_pwd
 CONFIG += thread
-CONFIG += widgets
 CONFIG += static
-CONFIG += openssl
-CONFIG += c++11
-
-QMAKE_CXXFLAGS += -fpermissive
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += widgets
-    DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0
-}
 
 # WIN32 OS
 # for boost 1.66 on windows, add (MinGW_Version)-mt-s-x32-(Boost_Version)
 # as a reference refer to the below section
-
 win32{
 BOOST_LIB_SUFFIX=-mgw81-mt-s-x32-1_67
 BOOST_INCLUDE_PATH=C:/deps/boost_1_67_0
@@ -37,7 +27,6 @@ QRENCODE_INCLUDE_PATH=C:/deps/qrencode-3.4.4
 QRENCODE_LIB_PATH=C:/deps/qrencode-3.4.4/.libs
 }
 
-# OTHER OS
 # for boost 1.37, add -mt to the boost libraries
 # use: qmake BOOST_LIB_SUFFIX=-mt
 # for boost thread win32 with _win32 sufix
@@ -47,9 +36,6 @@ QRENCODE_LIB_PATH=C:/deps/qrencode-3.4.4/.libs
 # Dependency library locations can be customized with:
 #    BOOST_INCLUDE_PATH, BOOST_LIB_PATH, BDB_INCLUDE_PATH,
 #    BDB_LIB_PATH, OPENSSL_INCLUDE_PATH and OPENSSL_LIB_PATH respectively
-
-# workaround for boost 1.58
-DEFINES += BOOST_VARIANT_USE_RELAXED_GET_BY_DEFAULT
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -66,7 +52,7 @@ contains(RELEASE, 1) {
 
     !windows:!macx {
         # Linux: static link
-        # LIBS += -Wl,-Bstatic
+        LIBS += -Wl,-Bstatic
     }
 }
 
@@ -84,7 +70,7 @@ win32:QMAKE_LFLAGS *= -Wl,--dynamicbase -Wl,--nxcompat
 # on Windows: enable GCC large address aware linker flag
 win32:QMAKE_LFLAGS *= -Wl,--large-address-aware -static
 # i686-w64-mingw32
-win32:QMAKE_LFLAGS *= -static-libgcc -static-libstdc++
+win32:QMAKE_LFLAGS += -static-libgcc -static-libstdc++
 # use: qmake "USE_QRCODE=1"
 # libqrencode (http://fukuchi.org/works/qrencode/index.en.html) must be installed for support
 contains(USE_QRCODE, 1) {
@@ -98,19 +84,18 @@ contains(USE_QRCODE, 1) {
 #  or: qmake "USE_UPNP=-" (not supported)
 # miniupnpc (http://miniupnp.free.fr/files/) must be installed for support
 contains(USE_UPNP, -) {
-message(Building without UPNP support)
+    message(Building without UPNP support)
 } else {
-message(Building with UPNP support)
-count(USE_UPNP, 0) {
-USE_UPNP=1
-}
-DEFINES += DMINIUPNP_STATICLIB
-INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
-LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
-win32:LIBS += -liphlpapi
+    message(Building with UPNP support)
+    count(USE_UPNP, 0) {
+        USE_UPNP=1
+    }
+    DEFINES += USE_UPNP=$$USE_UPNP MINIUPNP_STATICLIB STATICLIB
+    INCLUDEPATH += $$MINIUPNPC_INCLUDE_PATH
+    LIBS += $$join(MINIUPNPC_LIB_PATH,,-L,) -lminiupnpc
+    win32:LIBS += -liphlpapi
 }
 
-USE_DBUS=0
 # use: qmake "USE_DBUS=1" or qmake "USE_DBUS=0"
 linux:count(USE_DBUS, 0) {
     USE_DBUS=1
@@ -129,24 +114,24 @@ contains(ERA_NEED_QT_PLUGINS, 1) {
 INCLUDEPATH += src/leveldb/include src/leveldb/helpers
 LIBS += $$PWD/src/leveldb/libleveldb.a $$PWD/src/leveldb/libmemenv.a
 SOURCES += src/txdb-leveldb.cpp \
-    src/hmq1725/aes_helper.c \
-    src/hmq1725/blake.c \
-    src/hmq1725/bmw.c \
-    src/hmq1725/groestl.c \
-    src/hmq1725/jh.c \
-    src/hmq1725/keccak.c \
-    src/hmq1725/skein.c \
-    src/hmq1725/luffa.c \
-    src/hmq1725/cubehash.c \
-    src/hmq1725/shavite.c \
-    src/hmq1725/echo.c \
-    src/hmq1725/simd.c \
-    src/hmq1725/hamsi.c \
-    src/hmq1725/fugue.c \
-    src/hmq1725/shabal.c \
-    src/hmq1725/whirlpool.c \
-    src/hmq1725/haval.c \
-    src/hmq1725/sha2big.c
+    src/crypto/common/aes_helper.c \
+    src/crypto/common/blake.c \
+    src/crypto/common/bmw.c \
+    src/crypto/common/groestl.c \
+    src/crypto/common/jh.c \
+    src/crypto/common/keccak.c \
+    src/crypto/common/skein.c \
+    src/crypto/common/luffa.c \
+    src/crypto/common/cubehash.c \
+    src/crypto/common/shavite.c \
+    src/crypto/common/echo.c \
+    src/crypto/common/simd.c \
+    src/crypto/common/hamsi.c \
+    src/crypto/common/fugue.c \
+    src/crypto/common/shabal.c \
+    src/crypto/common/whirlpool.c \
+    src/crypto/common/haval.c \
+    src/crypto/common/sha2big.c
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
     genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a
@@ -157,14 +142,14 @@ SOURCES += src/txdb-leveldb.cpp \
     }
     LIBS += -lshlwapi
     # Disable if building on Windows
-    # genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
+    genleveldb.commands = cd $$PWD/src/leveldb && CC=$$QMAKE_CC CXX=$$QMAKE_CXX TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) OPT=\"$$QMAKE_CXXFLAGS $$QMAKE_CXXFLAGS_RELEASE\" libleveldb.a libmemenv.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libleveldb.a && $$QMAKE_RANLIB $$PWD/src/leveldb/libmemenv.a
 }
 genleveldb.target = $$PWD/src/leveldb/libleveldb.a
 genleveldb.depends = FORCE
 PRE_TARGETDEPS += $$PWD/src/leveldb/libleveldb.a
 QMAKE_EXTRA_TARGETS += genleveldb
 # Gross ugly hack that depends on qmake internals, unfortunately there is no other way to do it.
-# QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
+QMAKE_CLEAN += $$PWD/src/leveldb/libleveldb.a; cd $$PWD/src/leveldb ; $(MAKE) clean
 
 # regenerate src/build.h
 !windows|contains(USE_BUILD_INFO, 1) {
@@ -222,7 +207,7 @@ HEADERS += src/qt/eragui.h \
     src/hash.h \
     src/uint256.h \
     src/kernel.h \
-    src/scrypt.h \
+    src/crypto/scrypt/scrypt.h \
     src/pbkdf2.h \
     src/serialize.h \
     src/core.h \
@@ -284,26 +269,25 @@ HEADERS += src/qt/eragui.h \
     src/clientversion.h \
     src/threadsafety.h \
     src/tinyformat.h \
-    src/hmq1725/hashblock.h \
-    src/hmq1725/sph_blake.h \
-    src/hmq1725/sph_bmw.h \
-    src/hmq1725/sph_groestl.h \
-    src/hmq1725/sph_jh.h \
-    src/hmq1725/sph_keccak.h \
-    src/hmq1725/sph_skein.h \
-    src/hmq1725/sph_types.h \
-    #ADDED FOR HMQ1725
-    src/hmq1725/sph_luffa.h \
-    src/hmq1725/sph_cubehash.h \
-    src/hmq1725/sph_echo.h \
-    src/hmq1725/sph_shavite.h \
-    src/hmq1725/sph_simd.h \
-    src/hmq1725/sph_hamsi.h \
-    src/hmq1725/sph_fugue.h \
-    src/hmq1725/sph_shabal.h \
-    src/hmq1725/sph_whirlpool.h \
-    src/hmq1725/sph_haval.h \
-    src/hmq1725/sph_sha2.h
+    src/crypto/hmq/hmq1725.h \
+    src/crypto/common/include/sph_blake.h \
+    src/crypto/common/include/sph_bmw.h \
+    src/crypto/common/include/sph_groestl.h \
+    src/crypto/common/include/sph_jh.h \
+    src/crypto/common/include/sph_keccak.h \
+    src/crypto/common/include/sph_skein.h \
+    src/crypto/common/include/sph_types.h \
+    src/crypto/common/include/sph_luffa.h \
+    src/crypto/common/include/sph_cubehash.h \
+    src/crypto/common/include/sph_echo.h \
+    src/crypto/common/include/sph_shavite.h \
+    src/crypto/common/include/sph_simd.h \
+    src/crypto/common/include/sph_hamsi.h \
+    src/crypto/common/include/sph_fugue.h \
+    src/crypto/common/include/sph_shabal.h \
+    src/crypto/common/include/sph_whirlpool.h \
+    src/crypto/common/include/sph_haval.h \
+    src/crypto/common/include/sph_sha2.h
 
 SOURCES += src/qt/era.cpp src/qt/eragui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -376,10 +360,10 @@ SOURCES += src/qt/era.cpp src/qt/eragui.cpp \
     src/qt/rpcconsole.cpp \
     src/noui.cpp \
     src/kernel.cpp \
-    src/scrypt-arm.S \
-    src/scrypt-x86.S \
-    src/scrypt-x86_64.S \
-    src/scrypt.cpp \
+    src/crypto/scrypt/scrypt-arm.S \
+    src/crypto/scrypt/scrypt-x86.S \
+    src/crypto/scrypt/scrypt-x86_64.S \
+    src/crypto/scrypt/scrypt.cpp \
     src/pbkdf2.cpp
 
 RESOURCES += \
@@ -436,21 +420,27 @@ isEmpty(BOOST_LIB_SUFFIX) {
 }
 
 isEmpty(BOOST_THREAD_LIB_SUFFIX) {
-  # win32:BOOST_THREAD_LIB_SUFFIX = _win32$$BOOST_LIB_SUFFIX
-  # else:
     BOOST_THREAD_LIB_SUFFIX = $$BOOST_LIB_SUFFIX
 }
 
 isEmpty(BDB_LIB_PATH) {
-    macx:BDB_LIB_PATH = /opt/local/lib/db48
+    macx:BDB_LIB_PATH = /usr/local/BerkeleyDB.6.1/lib
+}
+
+isEmpty(OPENSSL_LIB_PATH) {
+    macx:OPENSSL_LIB_PATH = /opt/local/lib
 }
 
 isEmpty(BDB_LIB_SUFFIX) {
-    macx:BDB_LIB_SUFFIX = -4.8
+    macx:BDB_LIB_SUFFIX = -6.0
 }
 
 isEmpty(BDB_INCLUDE_PATH) {
-    macx:BDB_INCLUDE_PATH = /opt/local/include/db48
+    macx:BDB_INCLUDE_PATH = /opt/local/include/db60
+}
+
+isEmpty(OPENSSL_INCLUDE_PATH) {
+    macx:OPENSSL_INCLUDE_PATH = /opt/local/include
 }
 
 isEmpty(BOOST_LIB_PATH) {
@@ -461,7 +451,6 @@ isEmpty(BOOST_INCLUDE_PATH) {
     macx:BOOST_INCLUDE_PATH = /opt/local/include
 }
 
-windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/era-qt.rc
 
 windows:!contains(MINGW_THREAD_BUGFIX, 0) {

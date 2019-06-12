@@ -4,9 +4,6 @@
  * W.J. van der Laan 2011-2012
  * The Era Developers 2011-2012
  */
-
-#include <QApplication>
-
 #include "eragui.h"
 
 #include "transactiontablemodel.h"
@@ -38,6 +35,10 @@
 #include "macdockiconhandler.h"
 #endif
 
+#include <QApplication>
+#if QT_VERSION < 0x050000
+#include <QMainWindow>
+#endif
 #include <QMenuBar>
 #include <QMenu>
 #include <QIcon>
@@ -52,11 +53,16 @@
 #include <QDateTime>
 #include <QMovie>
 #include <QFileDialog>
+#if QT_VERSION < 0x050000
 #include <QDesktopServices>
+#else
+#include <QStandardPaths>
+#endif
 #include <QTimer>
 #include <QDragEnterEvent>
+#if QT_VERSION < 0x050000
 #include <QUrl>
-#include <QMimeData>
+#endif
 #include <QStyle>
 
 #include <iostream>
@@ -289,7 +295,11 @@ void EraGUI::createActions()
     aboutAction = new QAction(tr("&About Era"), this);
     aboutAction->setToolTip(tr("Show information about Era"));
     aboutAction->setMenuRole(QAction::AboutRole);
-    aboutQtAction = new QAction(tr("About &Qt"), this);
+#if QT_VERSION < 0x050000
+    aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#else
+    aboutQtAction = new QAction(QIcon(":/qt-project.org/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#endif
     aboutQtAction->setToolTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
     optionsAction = new QAction(tr("&Options..."), this);
@@ -938,7 +948,11 @@ void EraGUI::encryptWallet()
 
 void EraGUI::backupWallet()
 {
+#if QT_VERSION < 0x050000
     QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+#else
+    QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+#endif
     QString filename = QFileDialog::getSaveFileName(this, tr("Backup Wallet"), saveDir, tr("Wallet Data (*.dat)"));
     if(!filename.isEmpty()) {
         if(!walletModel->backupWallet(filename)) {
