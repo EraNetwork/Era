@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = era-qt
-VERSION = 1.0.1.1
+VERSION = 1.0.2.0
 INCLUDEPATH += src src/json src/qt
 QT += core gui widgets network
 DEFINES += ENABLE_WALLET
