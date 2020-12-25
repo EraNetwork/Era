@@ -50,22 +50,22 @@ extern "C" {
 
 /* Exported types */
 
-typedef struct leveldb_t               leveldb_t;
-typedef struct leveldb_cache_t         leveldb_cache_t;
-typedef struct leveldb_comparator_t    leveldb_comparator_t;
-typedef struct leveldb_env_t           leveldb_env_t;
-typedef struct leveldb_filelock_t      leveldb_filelock_t;
-typedef struct leveldb_filterpolicy_t  leveldb_filterpolicy_t;
-typedef struct leveldb_iterator_t      leveldb_iterator_t;
-typedef struct leveldb_logger_t        leveldb_logger_t;
-typedef struct leveldb_options_t       leveldb_options_t;
-typedef struct leveldb_randomfile_t    leveldb_randomfile_t;
-typedef struct leveldb_readoptions_t   leveldb_readoptions_t;
-typedef struct leveldb_seqfile_t       leveldb_seqfile_t;
-typedef struct leveldb_snapshot_t      leveldb_snapshot_t;
-typedef struct leveldb_writablefile_t  leveldb_writablefile_t;
-typedef struct leveldb_writebatch_t    leveldb_writebatch_t;
-typedef struct leveldb_writeoptions_t  leveldb_writeoptions_t;
+typedef struct leveldb_t leveldb_t;
+typedef struct leveldb_cache_t leveldb_cache_t;
+typedef struct leveldb_comparator_t leveldb_comparator_t;
+typedef struct leveldb_env_t leveldb_env_t;
+typedef struct leveldb_filelock_t leveldb_filelock_t;
+typedef struct leveldb_filterpolicy_t leveldb_filterpolicy_t;
+typedef struct leveldb_iterator_t leveldb_iterator_t;
+typedef struct leveldb_logger_t leveldb_logger_t;
+typedef struct leveldb_options_t leveldb_options_t;
+typedef struct leveldb_randomfile_t leveldb_randomfile_t;
+typedef struct leveldb_readoptions_t leveldb_readoptions_t;
+typedef struct leveldb_seqfile_t leveldb_seqfile_t;
+typedef struct leveldb_snapshot_t leveldb_snapshot_t;
+typedef struct leveldb_writablefile_t leveldb_writablefile_t;
+typedef struct leveldb_writebatch_t leveldb_writebatch_t;
+typedef struct leveldb_writeoptions_t leveldb_writeoptions_t;
 
 /* DB operations */
 
@@ -79,14 +79,17 @@ extern void leveldb_close(leveldb_t* db);
 extern void leveldb_put(
     leveldb_t* db,
     const leveldb_writeoptions_t* options,
-    const char* key, size_t keylen,
-    const char* val, size_t vallen,
+    const char* key,
+    size_t keylen,
+    const char* val,
+    size_t vallen,
     char** errptr);
 
 extern void leveldb_delete(
     leveldb_t* db,
     const leveldb_writeoptions_t* options,
-    const char* key, size_t keylen,
+    const char* key,
+    size_t keylen,
     char** errptr);
 
 extern void leveldb_write(
@@ -100,7 +103,8 @@ extern void leveldb_write(
 extern char* leveldb_get(
     leveldb_t* db,
     const leveldb_readoptions_t* options,
-    const char* key, size_t keylen,
+    const char* key,
+    size_t keylen,
     size_t* vallen,
     char** errptr);
 
@@ -124,14 +128,18 @@ extern char* leveldb_property_value(
 extern void leveldb_approximate_sizes(
     leveldb_t* db,
     int num_ranges,
-    const char* const* range_start_key, const size_t* range_start_key_len,
-    const char* const* range_limit_key, const size_t* range_limit_key_len,
+    const char* const* range_start_key,
+    const size_t* range_start_key_len,
+    const char* const* range_limit_key,
+    const size_t* range_limit_key_len,
     uint64_t* sizes);
 
 extern void leveldb_compact_range(
     leveldb_t* db,
-    const char* start_key, size_t start_key_len,
-    const char* limit_key, size_t limit_key_len);
+    const char* start_key,
+    size_t start_key_len,
+    const char* limit_key,
+    size_t limit_key_len);
 
 /* Management operations */
 
@@ -165,11 +173,14 @@ extern void leveldb_writebatch_destroy(leveldb_writebatch_t*);
 extern void leveldb_writebatch_clear(leveldb_writebatch_t*);
 extern void leveldb_writebatch_put(
     leveldb_writebatch_t*,
-    const char* key, size_t klen,
-    const char* val, size_t vlen);
+    const char* key,
+    size_t klen,
+    const char* val,
+    size_t vlen);
 extern void leveldb_writebatch_delete(
     leveldb_writebatch_t*,
-    const char* key, size_t klen);
+    const char* key,
+    size_t klen);
 extern void leveldb_writebatch_iterate(
     leveldb_writebatch_t*,
     void* state,
@@ -201,8 +212,8 @@ extern void leveldb_options_set_block_size(leveldb_options_t*, size_t);
 extern void leveldb_options_set_block_restart_interval(leveldb_options_t*, int);
 
 enum {
-  leveldb_no_compression = 0,
-  leveldb_snappy_compression = 1
+    leveldb_no_compression = 0,
+    leveldb_snappy_compression = 1
 };
 extern void leveldb_options_set_compression(leveldb_options_t*, int);
 
@@ -213,8 +224,10 @@ extern leveldb_comparator_t* leveldb_comparator_create(
     void (*destructor)(void*),
     int (*compare)(
         void*,
-        const char* a, size_t alen,
-        const char* b, size_t blen),
+        const char* a,
+        size_t alen,
+        const char* b,
+        size_t blen),
     const char* (*name)(void*));
 extern void leveldb_comparator_destroy(leveldb_comparator_t*);
 
@@ -225,13 +238,16 @@ extern leveldb_filterpolicy_t* leveldb_filterpolicy_create(
     void (*destructor)(void*),
     char* (*create_filter)(
         void*,
-        const char* const* key_array, const size_t* key_length_array,
+        const char* const* key_array,
+        const size_t* key_length_array,
         int num_keys,
         size_t* filter_length),
     unsigned char (*key_may_match)(
         void*,
-        const char* key, size_t length,
-        const char* filter, size_t filter_length),
+        const char* key,
+        size_t length,
+        const char* filter,
+        size_t filter_length),
     const char* (*name)(void*));
 extern void leveldb_filterpolicy_destroy(leveldb_filterpolicy_t*);
 
@@ -284,7 +300,7 @@ extern int leveldb_major_version();
 extern int leveldb_minor_version();
 
 #ifdef __cplusplus
-}  /* end extern "C" */
+} /* end extern "C" */
 #endif
 
-#endif  /* STORAGE_LEVELDB_INCLUDE_C_H_ */
+#endif /* STORAGE_LEVELDB_INCLUDE_C_H_ */

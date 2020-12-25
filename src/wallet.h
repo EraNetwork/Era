@@ -13,9 +13,9 @@
 #include <stdlib.h>
 
 #include "crypter.h"
-#include "main.h"
 #include "key.h"
 #include "keystore.h"
+#include "main.h"
 #include "script.h"
 #include "ui_interface.h"
 #include "util.h"
@@ -35,8 +35,7 @@ class COutput;
 class CWalletDB;
 
 /** (client) version numbers for particular wallet features */
-enum WalletFeature
-{
+enum WalletFeature {
     FEATURE_BASE = 10500, // the earliest version new wallets supports (only useful for getinfo's clientversion output)
 
     FEATURE_WALLETCRYPT = 40000, // wallet encryption
@@ -63,13 +62,11 @@ public:
         vchPubKey = vchPubKeyIn;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(nTime);
-        READWRITE(vchPubKey);
-    )
+        READWRITE(vchPubKey);)
 };
 
 /** A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
@@ -78,10 +75,10 @@ public:
 class CWallet : public CCryptoKeyStore, public CWalletInterface
 {
 private:
-    bool SelectCoinsForStaking(int64_t nTargetValue, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
-    bool SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet, const CCoinControl *coinControl=NULL) const;
+    bool SelectCoinsForStaking(int64_t nTargetValue, std::set<std::pair<const CWalletTx*, unsigned int>>& setCoinsRet, int64_t& nValueRet) const;
+    bool SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*, unsigned int>>& setCoinsRet, int64_t& nValueRet, const CCoinControl* coinControl = NULL) const;
 
-    CWalletDB *pwalletdbEncryption;
+    CWalletDB* pwalletdbEncryption;
 
     // the current wallet version: clients below this version are not able to load the wallet
     int nWalletVersion;
@@ -140,28 +137,38 @@ public:
     int64_t nTimeFirstKey;
 
     // check whether we are allowed to upgrade (or already support) to the named feature
-    bool CanSupportFeature(enum WalletFeature wf) { AssertLockHeld(cs_wallet); return nWalletMaxVersion >= wf; }
+    bool CanSupportFeature(enum WalletFeature wf)
+    {
+        AssertLockHeld(cs_wallet);
+        return nWalletMaxVersion >= wf;
+    }
 
     void AvailableCoinsForStaking(std::vector<COutput>& vCoins) const;
-    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true, const CCoinControl *coinControl=NULL) const;
-    bool SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
+    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed = true, const CCoinControl* coinControl = NULL) const;
+    bool SelectCoinsMinConf(int64_t nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int>>& setCoinsRet, int64_t& nValueRet) const;
 
     // keystore implementation
     // Generate a new key
     CPubKey GenerateNewKey();
     // Adds a key to the store, and saves it to disk.
-    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
+    bool AddKeyPubKey(const CKey& key, const CPubKey& pubkey);
     // Adds a key to the store, without saving it to disk (used by LoadWallet)
-    bool LoadKey(const CKey& key, const CPubKey &pubkey) { return CCryptoKeyStore::AddKeyPubKey(key, pubkey); }
+    bool LoadKey(const CKey& key, const CPubKey& pubkey) { return CCryptoKeyStore::AddKeyPubKey(key, pubkey); }
     // Load metadata (used by LoadWallet)
-    bool LoadKeyMetadata(const CPubKey &pubkey, const CKeyMetadata &metadata);
+    bool LoadKeyMetadata(const CPubKey& pubkey, const CKeyMetadata& metadata);
 
-    bool LoadMinVersion(int nVersion) { AssertLockHeld(cs_wallet); nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
+    bool LoadMinVersion(int nVersion)
+    {
+        AssertLockHeld(cs_wallet);
+        nWalletVersion = nVersion;
+        nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion);
+        return true;
+    }
 
     // Adds an encrypted key to the store, and saves it to disk.
-    bool AddCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
+    bool AddCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret);
     // Adds an encrypted key to the store, without saving it to disk (used by LoadWallet)
-    bool LoadCryptedKey(const CPubKey &vchPubKey, const std::vector<unsigned char> &vchCryptedSecret);
+    bool LoadCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret);
     bool AddCScript(const CScript& redeemScript);
     bool LoadCScript(const CScript& redeemScript);
 
@@ -169,16 +176,16 @@ public:
     bool ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase);
     bool EncryptWallet(const SecureString& strWalletPassphrase);
 
-    void GetKeyBirthTimes(std::map<CKeyID, int64_t> &mapKeyBirth) const;
+    void GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const;
 
 
     /** Increment the next transaction order id
         @return next transaction order id
      */
-    int64_t IncOrderPosNext(CWalletDB *pwalletdb = NULL);
+    int64_t IncOrderPosNext(CWalletDB* pwalletdb = NULL);
 
     typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef std::multimap<int64_t, TxPair > TxItems;
+    typedef std::multimap<int64_t, TxPair> TxItems;
 
     /** Get the wallet's activity log
         @return multimap of ordered transactions and accounting entries
@@ -190,7 +197,7 @@ public:
     bool AddToWallet(const CWalletTx& wtxIn);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock, bool fConnect = true);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
-    void EraseFromWallet(const uint256 &hash);
+    void EraseFromWallet(const uint256& hash);
     void WalletUpdateSpent(const CTransaction& prevout, bool fBlock = false);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
     void ReacceptWalletTransactions();
@@ -200,15 +207,15 @@ public:
     int64_t GetImmatureBalance() const;
     int64_t GetStake() const;
     int64_t GetNewMint() const;
-    bool CreateTransaction(const std::vector<std::pair<CScript, int64_t> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl *coinControl=NULL);
-    bool CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl *coinControl=NULL);
+    bool CreateTransaction(const std::vector<std::pair<CScript, int64_t>>& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl* coinControl = NULL);
+    bool CreateTransaction(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, CReserveKey& reservekey, int64_t& nFeeRet, const CCoinControl* coinControl = NULL);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
 
     uint64_t GetStakeWeight() const;
     bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, int64_t nFees, CTransaction& txNew, CKey& key);
 
-    std::string SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false);
-    std::string SendMoneyToDestination(const CTxDestination &address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee=false);
+    std::string SendMoney(CScript scriptPubKey, int64_t nValue, CWalletTx& wtxNew, bool fAskFee = false);
+    std::string SendMoneyToDestination(const CTxDestination& address, int64_t nValue, CWalletTx& wtxNew, bool fAskFee = false);
 
     bool NewKeyPool();
     bool TopUpKeyPool(unsigned int nSize = 0);
@@ -216,11 +223,11 @@ public:
     void ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool);
     void KeepKey(int64_t nIndex);
     void ReturnKey(int64_t nIndex);
-    bool GetKeyFromPool(CPubKey &key);
+    bool GetKeyFromPool(CPubKey& key);
     int64_t GetOldestKeyPoolTime();
     void GetAllReserveKeys(std::set<CKeyID>& setAddress) const;
 
-    std::set< std::set<CTxDestination> > GetAddressGroupings();
+    std::set<std::set<CTxDestination>> GetAddressGroupings();
     std::map<CTxDestination, int64_t> GetAddressBalances();
 
     bool IsMine(const CTxIn& txin) const;
@@ -244,7 +251,7 @@ public:
     }
     bool IsMine(const CTransaction& tx) const
     {
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
+        BOOST_FOREACH (const CTxOut& txout, tx.vout)
             if (IsMine(txout) && txout.nValue >= nMinimumInputValue)
                 return true;
         return false;
@@ -256,8 +263,7 @@ public:
     int64_t GetDebit(const CTransaction& tx) const
     {
         int64_t nDebit = 0;
-        BOOST_FOREACH(const CTxIn& txin, tx.vin)
-        {
+        BOOST_FOREACH (const CTxIn& txin, tx.vin) {
             nDebit += GetDebit(txin);
             if (!MoneyRange(nDebit))
                 throw std::runtime_error("CWallet::GetDebit() : value out of range");
@@ -267,8 +273,7 @@ public:
     int64_t GetCredit(const CTransaction& tx) const
     {
         int64_t nCredit = 0;
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
-        {
+        BOOST_FOREACH (const CTxOut& txout, tx.vout) {
             nCredit += GetCredit(txout);
             if (!MoneyRange(nCredit))
                 throw std::runtime_error("CWallet::GetCredit() : value out of range");
@@ -278,8 +283,7 @@ public:
     int64_t GetChange(const CTransaction& tx) const
     {
         int64_t nChange = 0;
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
-        {
+        BOOST_FOREACH (const CTxOut& txout, tx.vout) {
             nChange += GetChange(txout);
             if (!MoneyRange(nChange))
                 throw std::runtime_error("CWallet::GetChange() : value out of range");
@@ -294,9 +298,9 @@ public:
 
     bool DelAddressBookName(const CTxDestination& address);
 
-    void UpdatedTransaction(const uint256 &hashTx);
+    void UpdatedTransaction(const uint256& hashTx);
 
-    void Inventory(const uint256 &hash)
+    void Inventory(const uint256& hash)
     {
         {
             LOCK(cs_wallet);
@@ -312,7 +316,7 @@ public:
         return setKeyPool.size();
     }
 
-    bool SetDefaultKey(const CPubKey &vchPubKey);
+    bool SetDefaultKey(const CPubKey& vchPubKey);
 
     // signify that a particular wallet feature is now used. this may change nWalletVersion and nWalletMaxVersion if those are lower
     bool SetMinVersion(enum WalletFeature, CWalletDB* pwalletdbIn = NULL, bool fExplicit = false);
@@ -321,20 +325,24 @@ public:
     bool SetMaxVersion(int nVersion);
 
     // get the current wallet format (the oldest client version guaranteed to understand this wallet)
-    int GetVersion() { LOCK(cs_wallet); return nWalletVersion; }
+    int GetVersion()
+    {
+        LOCK(cs_wallet);
+        return nWalletVersion;
+    }
 
     void FixSpentCoins(int& nMismatchSpent, int64_t& nBalanceInQuestion, bool fCheckOnly = false);
-    void DisableTransaction(const CTransaction &tx);
+    void DisableTransaction(const CTransaction& tx);
 
     /** Address book entry changed.
      * @note called with lock cs_wallet held.
      */
-    boost::signals2::signal<void (CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)> NotifyAddressBookChanged;
+    boost::signals2::signal<void(CWallet* wallet, const CTxDestination& address, const std::string& label, bool isMine, ChangeType status)> NotifyAddressBookChanged;
 
     /** Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.
      */
-    boost::signals2::signal<void (CWallet *wallet, const uint256 &hashTx, ChangeType status)> NotifyTransactionChanged;
+    boost::signals2::signal<void(CWallet* wallet, const uint256& hashTx, ChangeType status)> NotifyTransactionChanged;
 };
 
 /** A key allocated from the key pool. */
@@ -344,6 +352,7 @@ protected:
     CWallet* pwallet;
     int64_t nIndex;
     CPubKey vchPubKey;
+
 public:
     CReserveKey(CWallet* pwalletIn)
     {
@@ -357,7 +366,7 @@ public:
     }
 
     void ReturnKey();
-    bool GetReservedKey(CPubKey &pubkey);
+    bool GetReservedKey(CPubKey& pubkey);
     void KeepKey();
 };
 
@@ -367,8 +376,7 @@ typedef std::map<std::string, std::string> mapValue_t;
 
 static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
 {
-    if (!mapValue.count("n"))
-    {
+    if (!mapValue.count("n")) {
         nOrderPos = -1; // TODO: calculate elsewhere
         return;
     }
@@ -395,14 +403,14 @@ private:
 public:
     std::vector<CMerkleTx> vtxPrev;
     mapValue_t mapValue;
-    std::vector<std::pair<std::string, std::string> > vOrderForm;
+    std::vector<std::pair<std::string, std::string>> vOrderForm;
     unsigned int fTimeReceivedIsTxTime;
-    unsigned int nTimeReceived;  // time received by this node
+    unsigned int nTimeReceived; // time received by this node
     unsigned int nTimeSmart;
     char fFromMe;
     std::string strFromAccount;
     std::vector<char> vfSpent; // which outputs are already spent
-    int64_t nOrderPos;  // position in ordered transaction list
+    int64_t nOrderPos;         // position in ordered transaction list
 
     // memory only
     mutable bool fDebitCached;
@@ -457,20 +465,17 @@ public:
         nOrderPos = -1;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         CWalletTx* pthis = const_cast<CWalletTx*>(this);
         if (fRead)
             pthis->Init(NULL);
         char fSpent = false;
 
-        if (!fRead)
-        {
+        if (!fRead) {
             pthis->mapValue["fromaccount"] = pthis->strFromAccount;
 
             std::string str;
-            BOOST_FOREACH(char f, vfSpent)
-            {
+            BOOST_FOREACH (char f, vfSpent) {
                 str += (f ? '1' : '0');
                 if (f)
                     fSpent = true;
@@ -483,7 +488,7 @@ public:
                 pthis->mapValue["timesmart"] = strprintf("%u", nTimeSmart);
         }
 
-        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion,ser_action);
+        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
         READWRITE(vtxPrev);
         READWRITE(mapValue);
         READWRITE(vOrderForm);
@@ -492,12 +497,11 @@ public:
         READWRITE(fFromMe);
         READWRITE(fSpent);
 
-        if (fRead)
-        {
+        if (fRead) {
             pthis->strFromAccount = pthis->mapValue["fromaccount"];
 
             if (mapValue.count("spent"))
-                BOOST_FOREACH(char c, pthis->mapValue["spent"])
+                BOOST_FOREACH (char c, pthis->mapValue["spent"])
                     pthis->vfSpent.push_back(c != '0');
             else
                 pthis->vfSpent.assign(vout.size(), fSpent);
@@ -511,21 +515,18 @@ public:
         pthis->mapValue.erase("version");
         pthis->mapValue.erase("spent");
         pthis->mapValue.erase("n");
-        pthis->mapValue.erase("timesmart");
-    )
+        pthis->mapValue.erase("timesmart");)
 
     // marks certain txout's as spent
     // returns true if any update took place
     bool UpdateSpent(const std::vector<char>& vfNewSpent)
     {
         bool fReturn = false;
-        for (unsigned int i = 0; i < vfNewSpent.size(); i++)
-        {
+        for (unsigned int i = 0; i < vfNewSpent.size(); i++) {
             if (i == vfSpent.size())
                 break;
 
-            if (vfNewSpent[i] && !vfSpent[i])
-            {
+            if (vfNewSpent[i] && !vfSpent[i]) {
                 vfSpent[i] = true;
                 fReturn = true;
                 fAvailableCreditCached = false;
@@ -543,7 +544,7 @@ public:
         fChangeCached = false;
     }
 
-    void BindWallet(CWallet *pwalletIn)
+    void BindWallet(CWallet* pwalletIn)
     {
         pwallet = pwalletIn;
         MarkDirty();
@@ -554,8 +555,7 @@ public:
         if (nOut >= vout.size())
             throw std::runtime_error("CWalletTx::MarkSpent() : nOut out of range");
         vfSpent.resize(vout.size());
-        if (!vfSpent[nOut])
-        {
+        if (!vfSpent[nOut]) {
             vfSpent[nOut] = true;
             fAvailableCreditCached = false;
         }
@@ -566,8 +566,7 @@ public:
         if (nOut >= vout.size())
             throw std::runtime_error("CWalletTx::MarkUnspent() : nOut out of range");
         vfSpent.resize(vout.size());
-        if (vfSpent[nOut])
-        {
+        if (vfSpent[nOut]) {
             vfSpent[nOut] = false;
             fAvailableCreditCached = false;
         }
@@ -593,7 +592,7 @@ public:
         return nDebitCached;
     }
 
-    int64_t GetCredit(bool fUseCache=true) const
+    int64_t GetCredit(bool fUseCache = true) const
     {
         // Must wait until coinbase is safely deep enough in the chain before valuing it
         if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
@@ -607,7 +606,7 @@ public:
         return nCreditCached;
     }
 
-    int64_t GetAvailableCredit(bool fUseCache=true) const
+    int64_t GetAvailableCredit(bool fUseCache = true) const
     {
         // Must wait until coinbase is safely deep enough in the chain before valuing it
         if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
@@ -617,11 +616,9 @@ public:
             return nAvailableCreditCached;
 
         int64_t nCredit = 0;
-        for (unsigned int i = 0; i < vout.size(); i++)
-        {
-            if (!IsSpent(i))
-            {
-                const CTxOut &txout = vout[i];
+        for (unsigned int i = 0; i < vout.size(); i++) {
+            if (!IsSpent(i)) {
+                const CTxOut& txout = vout[i];
                 nCredit += pwallet->GetCredit(txout);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
@@ -643,11 +640,12 @@ public:
         return nChangeCached;
     }
 
-    void GetAmounts(std::list<std::pair<CTxDestination, int64_t> >& listReceived,
-                    std::list<std::pair<CTxDestination, int64_t> >& listSent, int64_t& nFee, std::string& strSentAccount) const;
+    void GetAmounts(std::list<std::pair<CTxDestination, int64_t>>& listReceived,
+                    std::list<std::pair<CTxDestination, int64_t>>& listSent,
+                    int64_t& nFee,
+                    std::string& strSentAccount) const;
 
-    void GetAccountAmounts(const std::string& strAccount, int64_t& nReceived,
-                           int64_t& nSent, int64_t& nFee) const;
+    void GetAccountAmounts(const std::string& strAccount, int64_t& nReceived, int64_t& nSent, int64_t& nFee) const;
 
     bool IsFromMe() const
     {
@@ -671,10 +669,9 @@ public:
         // consider it confirmed if all dependencies are confirmed
         std::map<uint256, const CMerkleTx*> mapPrev;
         std::vector<const CMerkleTx*> vWorkQueue;
-        vWorkQueue.reserve(vtxPrev.size()+1);
+        vWorkQueue.reserve(vtxPrev.size() + 1);
         vWorkQueue.push_back(this);
-        for (unsigned int i = 0; i < vWorkQueue.size(); i++)
-        {
+        for (unsigned int i = 0; i < vWorkQueue.size(); i++) {
             const CMerkleTx* ptx = vWorkQueue[i];
 
             if (!IsFinalTx(*ptx))
@@ -687,14 +684,12 @@ public:
             if (!pwallet->IsFromMe(*ptx))
                 return false;
 
-            if (mapPrev.empty())
-            {
-                BOOST_FOREACH(const CMerkleTx& tx, vtxPrev)
+            if (mapPrev.empty()) {
+                BOOST_FOREACH (const CMerkleTx& tx, vtxPrev)
                     mapPrev[tx.GetHash()] = &tx;
             }
 
-            BOOST_FOREACH(const CTxIn& txin, ptx->vin)
-            {
+            BOOST_FOREACH (const CTxIn& txin, ptx->vin) {
                 if (!mapPrev.count(txin.prevout.hash))
                     return false;
                 vWorkQueue.push_back(mapPrev[txin.prevout.hash]);
@@ -719,18 +714,18 @@ public:
 };
 
 
-
-
 class COutput
 {
 public:
-    const CWalletTx *tx;
+    const CWalletTx* tx;
     int i;
     int nDepth;
 
-    COutput(const CWalletTx *txIn, int iIn, int nDepthIn)
+    COutput(const CWalletTx* txIn, int iIn, int nDepthIn)
     {
-        tx = txIn; i = iIn; nDepth = nDepthIn;
+        tx = txIn;
+        i = iIn;
+        nDepth = nDepthIn;
     }
 
     std::string ToString() const
@@ -738,8 +733,6 @@ public:
         return strprintf("COutput(%s, %d, %d) [%s]", tx->GetHash().ToString(), i, nDepth, FormatMoney(tx->vout[i].nValue));
     }
 };
-
-
 
 
 /** Private key that includes an expiration date in case it never gets used. */
@@ -753,26 +746,20 @@ public:
     //// todo: add something to note what created it (user, getnewaddress, change)
     ////   maybe should have a map<string, string> property map
 
-    CWalletKey(int64_t nExpires=0)
+    CWalletKey(int64_t nExpires = 0)
     {
         nTimeCreated = (nExpires ? GetTime() : 0);
         nTimeExpires = nExpires;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(vchPrivKey);
         READWRITE(nTimeCreated);
         READWRITE(nTimeExpires);
-        READWRITE(strComment);
-    )
+        READWRITE(strComment);)
 };
-
-
-
-
 
 
 /** Account information.
@@ -793,14 +780,11 @@ public:
         vchPubKey = CPubKey();
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
-        READWRITE(vchPubKey);
-    )
+        READWRITE(vchPubKey);)
 };
-
 
 
 /** Internal transfers.
@@ -815,7 +799,7 @@ public:
     std::string strOtherAccount;
     std::string strComment;
     mapValue_t mapValue;
-    int64_t nOrderPos;  // position in ordered transaction list
+    int64_t nOrderPos; // position in ordered transaction list
     uint64_t nEntryNo;
 
     CAccountingEntry()
@@ -833,8 +817,7 @@ public:
         nOrderPos = -1;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         CAccountingEntry& me = *const_cast<CAccountingEntry*>(this);
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
@@ -843,12 +826,10 @@ public:
         READWRITE(nTime);
         READWRITE(strOtherAccount);
 
-        if (!fRead)
-        {
+        if (!fRead) {
             WriteOrderPos(nOrderPos, me.mapValue);
 
-            if (!(mapValue.empty() && _ssExtra.empty()))
-            {
+            if (!(mapValue.empty() && _ssExtra.empty())) {
                 CDataStream ss(nType, nVersion);
                 ss.insert(ss.begin(), '\0');
                 ss << mapValue;
@@ -860,22 +841,18 @@ public:
         READWRITE(strComment);
 
         size_t nSepPos = strComment.find("\0", 0, 1);
-        if (fRead)
-        {
+        if (fRead) {
             me.mapValue.clear();
-            if (std::string::npos != nSepPos)
-            {
+            if (std::string::npos != nSepPos) {
                 CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), nType, nVersion);
                 ss >> me.mapValue;
                 me._ssExtra = std::vector<char>(ss.begin(), ss.end());
             }
             ReadOrderPos(me.nOrderPos, me.mapValue);
-        }
-        if (std::string::npos != nSepPos)
+        } if (std::string::npos != nSepPos)
             me.strComment.erase(nSepPos);
 
-        me.mapValue.erase("n");
-    )
+        me.mapValue.erase("n");)
 
 private:
     std::vector<char> _ssExtra;

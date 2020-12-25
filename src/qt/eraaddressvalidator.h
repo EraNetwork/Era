@@ -11,9 +11,9 @@ class EraAddressValidator : public QValidator
     Q_OBJECT
 
 public:
-    explicit EraAddressValidator(QObject *parent = 0);
+    explicit EraAddressValidator(QObject* parent = 0);
 
-    State validate(QString &input, int &pos) const;
+    State validate(QString& input, int& pos) const;
 
     static const int MaxAddressLength = 35;
 };

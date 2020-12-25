@@ -24,13 +24,12 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView(QWidget *parent = 0);
+    explicit TransactionView(QWidget* parent = 0);
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
 
     // Date ranges for filter
-    enum DateEnum
-    {
+    enum DateEnum {
         All,
         Today,
         ThisWeek,
@@ -41,25 +40,25 @@ public:
     };
 
 private:
-    WalletModel *model;
-    TransactionFilterProxy *transactionProxyModel;
-    QTableView *transactionView;
+    WalletModel* model;
+    TransactionFilterProxy* transactionProxyModel;
+    QTableView* transactionView;
 
-    QComboBox *dateWidget;
-    QComboBox *typeWidget;
-    QLineEdit *addressWidget;
-    QLineEdit *amountWidget;
+    QComboBox* dateWidget;
+    QComboBox* typeWidget;
+    QLineEdit* addressWidget;
+    QLineEdit* amountWidget;
 
-    QMenu *contextMenu;
+    QMenu* contextMenu;
 
-    QFrame *dateRangeWidget;
-    QDateTimeEdit *dateFrom;
-    QDateTimeEdit *dateTo;
+    QFrame* dateRangeWidget;
+    QDateTimeEdit* dateFrom;
+    QDateTimeEdit* dateTo;
 
-    QWidget *createDateRangeWidget();
+    QWidget* createDateRangeWidget();
 
 private slots:
-    void contextualMenu(const QPoint &);
+    void contextualMenu(const QPoint&);
     void dateRangeChanged();
     void showDetails();
     void copyAddress();
@@ -76,11 +75,10 @@ signals:
 public slots:
     void chooseDate(int idx);
     void chooseType(int idx);
-    void changedPrefix(const QString &prefix);
-    void changedAmount(const QString &amount);
+    void changedPrefix(const QString& prefix);
+    void changedAmount(const QString& amount);
     void exportClicked();
     void focusTransaction(const QModelIndex&);
-
 };
 
 #endif // TRANSACTIONVIEW_H

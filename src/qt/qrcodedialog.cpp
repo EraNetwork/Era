@@ -11,11 +11,10 @@
 
 #include <qrencode.h>
 
-QRCodeDialog::QRCodeDialog(const QString &addr, const QString &label, bool enableReq, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::QRCodeDialog),
-    model(0),
-    address(addr)
+QRCodeDialog::QRCodeDialog(const QString& addr, const QString& label, bool enableReq, QWidget* parent) : QDialog(parent),
+                                                                                                         ui(new Ui::QRCodeDialog),
+                                                                                                         model(0),
+                                                                                                         address(addr)
 {
     ui->setupUi(this);
 
@@ -37,7 +36,7 @@ QRCodeDialog::~QRCodeDialog()
     delete ui;
 }
 
-void QRCodeDialog::setModel(OptionsModel *model)
+void QRCodeDialog::setModel(OptionsModel* model)
 {
     this->model = model;
 
@@ -52,23 +51,19 @@ void QRCodeDialog::genCode()
 {
     QString uri = getURI();
 
-    if (uri != "")
-    {
+    if (uri != "") {
         ui->lblQRCode->setText("");
 
-        QRcode *code = QRcode_encodeString(uri.toUtf8().constData(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
-        if (!code)
-        {
+        QRcode* code = QRcode_encodeString(uri.toUtf8().constData(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
+        if (!code) {
             ui->lblQRCode->setText(tr("Error encoding URI into QR Code."));
             return;
         }
         myImage = QImage(code->width + 8, code->width + 8, QImage::Format_RGB32);
         myImage.fill(0xffffff);
-        unsigned char *p = code->data;
-        for (int y = 0; y < code->width; y++)
-        {
-            for (int x = 0; x < code->width; x++)
-            {
+        unsigned char* p = code->data;
+        for (int y = 0; y < code->width; y++) {
+            for (int x = 0; x < code->width; x++) {
                 myImage.setPixel(x + 4, y + 4, ((*p & 1) ? 0x0 : 0xffffff));
                 p++;
             }
@@ -88,39 +83,32 @@ QString QRCodeDialog::getURI()
 
     ui->outUri->clear();
 
-    if (ui->chkReqPayment->isChecked())
-    {
-        if (ui->lnReqAmount->validate())
-        {
+    if (ui->chkReqPayment->isChecked()) {
+        if (ui->lnReqAmount->validate()) {
             // even if we allow a non ERA unit input in lnReqAmount, we generate the URI with ERA as unit (as defined in BIP21)
             ret += QString("?amount=%1").arg(EraUnits::format(EraUnits::ERA, ui->lnReqAmount->value()));
             paramCount++;
-        }
-        else
-        {
+        } else {
             ui->btnSaveAs->setEnabled(false);
             ui->lblQRCode->setText(tr("The entered amount is invalid, please check."));
             return QString("");
         }
     }
 
-    if (!ui->lnLabel->text().isEmpty())
-    {
+    if (!ui->lnLabel->text().isEmpty()) {
         QString lbl(QUrl::toPercentEncoding(ui->lnLabel->text()));
         ret += QString("%1label=%2").arg(paramCount == 0 ? "?" : "&").arg(lbl);
         paramCount++;
     }
 
-    if (!ui->lnMessage->text().isEmpty())
-    {
+    if (!ui->lnMessage->text().isEmpty()) {
         QString msg(QUrl::toPercentEncoding(ui->lnMessage->text()));
         ret += QString("%1message=%2").arg(paramCount == 0 ? "?" : "&").arg(msg);
         paramCount++;
     }
 
     // limit URI length to prevent a DoS against the QR-Code dialog
-    if (ret.length() > MAX_URI_LENGTH)
-    {
+    if (ret.length() > MAX_URI_LENGTH) {
         ui->btnSaveAs->setEnabled(false);
         ui->lblQRCode->setText(tr("Resulting URI too long, try to reduce the text for label / message."));
         return QString("");
@@ -163,8 +151,7 @@ void QRCodeDialog::on_chkReqPayment_toggled(bool fChecked)
 
 void QRCodeDialog::updateDisplayUnit()
 {
-    if (model)
-    {
+    if (model) {
         // Update lnReqAmount with the current unit
         ui->lnReqAmount->setDisplayUnit(model->getDisplayUnit());
     }

@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-    class AskPassphraseDialog;
+class AskPassphraseDialog;
 }
 class WalletModel;
 
@@ -23,23 +23,23 @@ public:
         Decrypt        /**< Ask passphrase and decrypt wallet */
     };
 
-    explicit AskPassphraseDialog(Mode mode, QWidget *parent = 0);
+    explicit AskPassphraseDialog(Mode mode, QWidget* parent = 0);
     ~AskPassphraseDialog();
 
     void accept();
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
 
 private:
-    Ui::AskPassphraseDialog *ui;
+    Ui::AskPassphraseDialog* ui;
     Mode mode;
-    WalletModel *model;
+    WalletModel* model;
     bool fCapsLock;
 
 private slots:
     void textChanged();
-    bool event(QEvent *event);
-    bool eventFilter(QObject *, QEvent *event);
+    bool event(QEvent* event);
+    bool eventFilter(QObject*, QEvent* event);
     void secureClearPassFields();
 };
 

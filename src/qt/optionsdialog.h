@@ -16,14 +16,14 @@ class OptionsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit OptionsDialog(QWidget *parent = 0);
+    explicit OptionsDialog(QWidget* parent = 0);
     ~OptionsDialog();
 
-    void setModel(OptionsModel *model);
+    void setModel(OptionsModel* model);
     void setMapper();
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 private slots:
     /* enable only apply button */
@@ -43,15 +43,15 @@ private slots:
     void showRestartWarning_Proxy();
     void showRestartWarning_Lang();
     void updateDisplayUnit();
-    void handleProxyIpValid(QValidatedLineEdit *object, bool fState);
+    void handleProxyIpValid(QValidatedLineEdit* object, bool fState);
 
 signals:
-    void proxyIpValid(QValidatedLineEdit *object, bool fValid);
+    void proxyIpValid(QValidatedLineEdit* object, bool fValid);
 
 private:
-    Ui::OptionsDialog *ui;
-    OptionsModel *model;
-    MonitoredDataMapper *mapper;
+    Ui::OptionsDialog* ui;
+    OptionsModel* model;
+    MonitoredDataMapper* mapper;
     bool fRestartWarningDisplayed_Proxy;
     bool fRestartWarningDisplayed_Lang;
     bool fProxyIpValid;

@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "core.h"
 #include "txmempool.h"
+#include "core.h"
 #include "main.h" // for CTransaction
 
 using namespace std;
@@ -25,7 +25,7 @@ void CTxMemPool::AddTransactionsUpdated(unsigned int n)
     nTransactionsUpdated += n;
 }
 
-bool CTxMemPool::addUnchecked(const uint256& hash, CTransaction &tx)
+bool CTxMemPool::addUnchecked(const uint256& hash, CTransaction& tx)
 {
     // Add to memory pool without checking anything.
     // Used by main.cpp AcceptToMemoryPool(), which DOES do
@@ -40,14 +40,13 @@ bool CTxMemPool::addUnchecked(const uint256& hash, CTransaction &tx)
     return true;
 }
 
-bool CTxMemPool::remove(const CTransaction &tx, bool fRecursive)
+bool CTxMemPool::remove(const CTransaction& tx, bool fRecursive)
 {
     // Remove transaction from memory pool
     {
         LOCK(cs);
         uint256 hash = tx.GetHash();
-        if (mapTx.count(hash))
-        {
+        if (mapTx.count(hash)) {
             if (fRecursive) {
                 for (unsigned int i = 0; i < tx.vout.size(); i++) {
                     std::map<COutPoint, CInPoint>::iterator it = mapNextTx.find(COutPoint(hash, i));
@@ -55,7 +54,7 @@ bool CTxMemPool::remove(const CTransaction &tx, bool fRecursive)
                         remove(*it->second.ptx, true);
                 }
             }
-            BOOST_FOREACH(const CTxIn& txin, tx.vin)
+            BOOST_FOREACH (const CTxIn& txin, tx.vin)
                 mapNextTx.erase(txin.prevout);
             mapTx.erase(hash);
             nTransactionsUpdated++;
@@ -64,14 +63,14 @@ bool CTxMemPool::remove(const CTransaction &tx, bool fRecursive)
     return true;
 }
 
-bool CTxMemPool::removeConflicts(const CTransaction &tx)
+bool CTxMemPool::removeConflicts(const CTransaction& tx)
 {
     // Remove transactions which depend on inputs of tx, recursively
     LOCK(cs);
-    BOOST_FOREACH(const CTxIn &txin, tx.vin) {
+    BOOST_FOREACH (const CTxIn& txin, tx.vin) {
         std::map<COutPoint, CInPoint>::iterator it = mapNextTx.find(txin.prevout);
         if (it != mapNextTx.end()) {
-            const CTransaction &txConflict = *it->second.ptx;
+            const CTransaction& txConflict = *it->second.ptx;
             if (txConflict != tx)
                 remove(txConflict, true);
         }

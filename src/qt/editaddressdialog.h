@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-    class EditAddressDialog;
+class EditAddressDialog;
 }
 class AddressTableModel;
 
@@ -26,14 +26,14 @@ public:
         EditSendingAddress
     };
 
-    explicit EditAddressDialog(Mode mode, QWidget *parent = 0);
+    explicit EditAddressDialog(Mode mode, QWidget* parent = 0);
     ~EditAddressDialog();
 
-    void setModel(AddressTableModel *model);
+    void setModel(AddressTableModel* model);
     void loadRow(int row);
 
     QString getAddress() const;
-    void setAddress(const QString &address);
+    void setAddress(const QString& address);
 
 public slots:
     void accept();
@@ -41,10 +41,10 @@ public slots:
 private:
     bool saveCurrentRow();
 
-    Ui::EditAddressDialog *ui;
-    QDataWidgetMapper *mapper;
+    Ui::EditAddressDialog* ui;
+    QDataWidgetMapper* mapper;
     Mode mode;
-    AddressTableModel *model;
+    AddressTableModel* model;
 
     QString address;
 };

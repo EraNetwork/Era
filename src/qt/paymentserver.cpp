@@ -61,15 +61,13 @@ bool PaymentServer::ipcSendCommandLine()
     bool fResult = false;
 
     const QStringList& args = qApp->arguments();
-    for (int i = 1; i < args.size(); i++)
-    {
+    for (int i = 1; i < args.size(); i++) {
         if (!args[i].startsWith(ERA_IPC_PREFIX, Qt::CaseInsensitive))
             continue;
         savedPaymentRequests.append(args[i]);
     }
 
-    foreach (const QString& arg, savedPaymentRequests)
-    {
+    foreach (const QString& arg, savedPaymentRequests) {
         QLocalSocket* socket = new QLocalSocket();
         socket->connectToServer(ipcServerName(), QIODevice::WriteOnly);
         if (!socket->waitForConnected(ERA_IPC_CONNECT_TIMEOUT))
@@ -109,14 +107,12 @@ PaymentServer::PaymentServer(QApplication* parent) : QObject(parent), saveURIs(t
         connect(uriServer, SIGNAL(newConnection()), this, SLOT(handleURIConnection()));
 }
 
-bool PaymentServer::eventFilter(QObject *object, QEvent *event)
+bool PaymentServer::eventFilter(QObject* object, QEvent* event)
 {
     // clicking on era: URLs creates FileOpen events on the Mac:
-    if (event->type() == QEvent::FileOpen)
-    {
+    if (event->type() == QEvent::FileOpen) {
         QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
-        if (!fileEvent->url().isEmpty())
-        {
+        if (!fileEvent->url().isEmpty()) {
             if (saveURIs) // Before main window is ready:
                 savedPaymentRequests.append(fileEvent->url().toString());
             else
@@ -137,7 +133,7 @@ void PaymentServer::uiReady()
 
 void PaymentServer::handleURIConnection()
 {
-    QLocalSocket *clientConnection = uriServer->nextPendingConnection();
+    QLocalSocket* clientConnection = uriServer->nextPendingConnection();
 
     while (clientConnection->bytesAvailable() < (int)sizeof(quint32))
         clientConnection->waitForReadyRead();
@@ -159,7 +155,7 @@ void PaymentServer::handleURIConnection()
         emit receivedURI(message);
 }
 
-void PaymentServer::setOptionsModel(OptionsModel *optionsModel)
+void PaymentServer::setOptionsModel(OptionsModel* optionsModel)
 {
     this->optionsModel = optionsModel;
 }

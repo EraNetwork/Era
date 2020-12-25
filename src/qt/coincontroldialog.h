@@ -11,7 +11,7 @@
 #include <QTreeWidgetItem>
 
 namespace Ui {
-    class CoinControlDialog;
+class CoinControlDialog;
 }
 class WalletModel;
 class CCoinControl;
@@ -21,26 +21,26 @@ class CoinControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog(QWidget *parent = 0);
+    explicit CoinControlDialog(QWidget* parent = 0);
     ~CoinControlDialog();
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
 
     // static because also called from sendcoinsdialog
     static void updateLabels(WalletModel*, QDialog*);
 
     static QList<qint64> payAmounts;
-    static CCoinControl *coinControl;
+    static CCoinControl* coinControl;
 
 private:
-    Ui::CoinControlDialog *ui;
-    WalletModel *model;
+    Ui::CoinControlDialog* ui;
+    WalletModel* model;
     int sortColumn;
     Qt::SortOrder sortOrder;
 
-    QMenu *contextMenu;
-    QTreeWidgetItem *contextMenuItem;
-    QAction *copyTransactionHashAction;
+    QMenu* contextMenu;
+    QTreeWidgetItem* contextMenuItem;
+    QAction* copyTransactionHashAction;
     //QAction *lockAction;
     //QAction *unlockAction;
 
@@ -48,8 +48,7 @@ private:
     void sortView(int, Qt::SortOrder);
     void updateView();
 
-    enum
-    {
+    enum {
         COLUMN_CHECKBOX,
         COLUMN_AMOUNT,
         COLUMN_LABEL,
@@ -62,7 +61,7 @@ private:
     };
 
 private slots:
-    void showMenu(const QPoint &);
+    void showMenu(const QPoint&);
     void copyAmount();
     void copyLabel();
     void copyAddress();

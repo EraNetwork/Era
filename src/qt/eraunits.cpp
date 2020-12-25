@@ -2,9 +2,8 @@
 
 #include <QStringList>
 
-EraUnits::EraUnits(QObject *parent):
-        QAbstractListModel(parent),
-        unitlist(availableUnits())
+EraUnits::EraUnits(QObject* parent) : QAbstractListModel(parent),
+                                      unitlist(availableUnits())
 {
 }
 
@@ -19,8 +18,7 @@ QList<EraUnits::Unit> EraUnits::availableUnits()
 
 bool EraUnits::valid(int unit)
 {
-    switch(unit)
-    {
+    switch (unit) {
     case ERA:
     case mERA:
     case uERA:
@@ -32,8 +30,7 @@ bool EraUnits::valid(int unit)
 
 QString EraUnits::name(int unit)
 {
-    switch(unit)
-    {
+    switch (unit) {
     case ERA: return QString("ERA");
     case mERA: return QString("mERA");
     case uERA: return QString::fromUtf8("μERA");
@@ -43,8 +40,7 @@ QString EraUnits::name(int unit)
 
 QString EraUnits::description(int unit)
 {
-    switch(unit)
-    {
+    switch (unit) {
     case ERA: return QString("Eras");
     case mERA: return QString("Milli-Eras (1 / 1,000)");
     case uERA: return QString("Micro-Eras (1 / 1,000,000)");
@@ -54,20 +50,18 @@ QString EraUnits::description(int unit)
 
 qint64 EraUnits::factor(int unit)
 {
-    switch(unit)
-    {
-    case ERA:  return 100000000;
+    switch (unit) {
+    case ERA: return 100000000;
     case mERA: return 100000;
     case uERA: return 100;
-    default:   return 100000000;
+    default: return 100000000;
     }
 }
 
 int EraUnits::amountDigits(int unit)
 {
-    switch(unit)
-    {
-    case ERA: return 8; // 21,000,000 (# digits, without commas)
+    switch (unit) {
+    case ERA: return 8;   // 21,000,000 (# digits, without commas)
     case mERA: return 11; // 21,000,000,000
     case uERA: return 14; // 21,000,000,000,000
     default: return 0;
@@ -76,8 +70,7 @@ int EraUnits::amountDigits(int unit)
 
 int EraUnits::decimals(int unit)
 {
-    switch(unit)
-    {
+    switch (unit) {
     case ERA: return 8;
     case mERA: return 5;
     case uERA: return 2;
@@ -89,7 +82,7 @@ QString EraUnits::format(int unit, qint64 n, bool fPlus)
 {
     // Note: not using straight sprintf here because we do NOT want
     // localized number formatting.
-    if(!valid(unit))
+    if (!valid(unit))
         return QString(); // Refuse to format invalid unit
     qint64 coin = factor(unit);
     int num_decimals = decimals(unit);
@@ -101,7 +94,7 @@ QString EraUnits::format(int unit, qint64 n, bool fPlus)
 
     // Right-trim excess zeros after the decimal point
     int nTrim = 0;
-    for (int i = remainder_str.size()-1; i>=2 && (remainder_str.at(i) == '0'); --i)
+    for (int i = remainder_str.size() - 1; i >= 2 && (remainder_str.at(i) == '0'); --i)
         ++nTrim;
     remainder_str.chop(nTrim);
 
@@ -117,57 +110,50 @@ QString EraUnits::formatWithUnit(int unit, qint64 amount, bool plussign)
     return format(unit, amount, plussign) + QString(" ") + name(unit);
 }
 
-bool EraUnits::parse(int unit, const QString &value, qint64 *val_out)
+bool EraUnits::parse(int unit, const QString& value, qint64* val_out)
 {
-    if(!valid(unit) || value.isEmpty())
+    if (!valid(unit) || value.isEmpty())
         return false; // Refuse to parse invalid unit or empty string
     int num_decimals = decimals(unit);
     QStringList parts = value.split(".");
 
-    if(parts.size() > 2)
-    {
+    if (parts.size() > 2) {
         return false; // More than one dot
     }
     QString whole = parts[0];
     QString decimals;
 
-    if(parts.size() > 1)
-    {
+    if (parts.size() > 1) {
         decimals = parts[1];
     }
-    if(decimals.size() > num_decimals)
-    {
+    if (decimals.size() > num_decimals) {
         return false; // Exceeds max precision
     }
     bool ok = false;
     QString str = whole + decimals.leftJustified(num_decimals, '0');
 
-    if(str.size() > 18)
-    {
+    if (str.size() > 18) {
         return false; // Longer numbers will exceed 63 bits
     }
     qint64 retvalue = str.toLongLong(&ok);
-    if(val_out)
-    {
+    if (val_out) {
         *val_out = retvalue;
     }
     return ok;
 }
 
-int EraUnits::rowCount(const QModelIndex &parent) const
+int EraUnits::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return unitlist.size();
 }
 
-QVariant EraUnits::data(const QModelIndex &index, int role) const
+QVariant EraUnits::data(const QModelIndex& index, int role) const
 {
     int row = index.row();
-    if(row >= 0 && row < unitlist.size())
-    {
+    if (row >= 0 && row < unitlist.size()) {
         Unit unit = unitlist.at(row);
-        switch(role)
-        {
+        switch (role) {
         case Qt::EditRole:
         case Qt::DisplayRole:
             return QVariant(name(unit));

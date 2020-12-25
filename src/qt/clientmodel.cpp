@@ -1,8 +1,8 @@
 #include "clientmodel.h"
 
+#include "addresstablemodel.h"
 #include "guiconstants.h"
 #include "optionsmodel.h"
-#include "addresstablemodel.h"
 #include "transactiontablemodel.h"
 
 #include "chainparams.h"
@@ -10,14 +10,13 @@
 #include "ui_interface.h"
 
 #include <QDateTime>
-#include <QTimer>
 #include <QDebug>
+#include <QTimer>
 
 static const int64_t nClientStartupTime = GetTime();
 
-ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
-    QObject(parent), optionsModel(optionsModel),
-    cachedNumBlocks(0), numBlocksAtStartup(-1), pollTimer(0)
+ClientModel::ClientModel(OptionsModel* optionsModel, QObject* parent) : QObject(parent), optionsModel(optionsModel),
+                                                                        cachedNumBlocks(0), numBlocksAtStartup(-1), pollTimer(0)
 {
     pollTimer = new QTimer(this);
     pollTimer->setInterval(MODEL_UPDATE_DELAY);
@@ -39,9 +38,9 @@ int ClientModel::getNumConnections(unsigned int flags) const
         return vNodes.size();
 
     int nNum = 0;
-    BOOST_FOREACH(CNode* pnode, vNodes)
-    if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
-        nNum++;
+    BOOST_FOREACH (CNode* pnode, vNodes)
+        if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
+            nNum++;
 
     return nNum;
 }
@@ -84,14 +83,13 @@ void ClientModel::updateTimer()
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
     TRY_LOCK(cs_main, lockMain);
-    if(!lockMain)
+    if (!lockMain)
         return;
     // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
     // Periodically check and update with a timer.
     int newNumBlocks = getNumBlocks();
 
-    if(cachedNumBlocks != newNumBlocks)
-    {
+    if (cachedNumBlocks != newNumBlocks) {
         cachedNumBlocks = newNumBlocks;
 
         emit numBlocksChanged(newNumBlocks);
@@ -130,7 +128,7 @@ QString ClientModel::getStatusBarWarnings() const
     return QString::fromStdString(GetWarnings("statusbar"));
 }
 
-OptionsModel *ClientModel::getOptionsModel()
+OptionsModel* ClientModel::getOptionsModel()
 {
     return optionsModel;
 }
@@ -160,17 +158,17 @@ QString ClientModel::formatClientStartupTime() const
     return QDateTime::fromTime_t(nClientStartupTime).toString();
 }
 
-static void NotifyNumConnectionsChanged(ClientModel *clientmodel, int newNumConnections)
+static void NotifyNumConnectionsChanged(ClientModel* clientmodel, int newNumConnections)
 {
     // Too noisy: qDebug() << "NotifyNumConnectionsChanged : " + QString::number(newNumConnections);
     QMetaObject::invokeMethod(clientmodel, "updateNumConnections", Qt::QueuedConnection,
                               Q_ARG(int, newNumConnections));
 }
 
-static void NotifyAlertChanged(ClientModel *clientmodel)
+static void NotifyAlertChanged(ClientModel* clientmodel)
 {
-     qDebug() << "NotifyAlertChanged";
-     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection);
+    qDebug() << "NotifyAlertChanged";
+    QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection);
 }
 
 void ClientModel::subscribeToCoreSignals()

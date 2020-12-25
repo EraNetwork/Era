@@ -3,16 +3,17 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <set>
 #include "rpcclient.h"
+#include <set>
 
-#include "rpcprotocol.h"
-#include "util.h"
-#include "ui_interface.h"
 #include "chainparams.h" // for Params().RPCPort()
+#include "rpcprotocol.h"
+#include "ui_interface.h"
+#include "util.h"
 
 #include <stdint.h>
 
+#include "json/json_spirit_writer_template.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -23,7 +24,6 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
-#include "json/json_spirit_writer_template.h"
 
 using namespace std;
 using namespace boost;
@@ -32,7 +32,6 @@ using namespace json_spirit;
 
 Object CallRPC(const string& strMethod, const Array& params)
 {
-
     // Connect to localhost
     bool fUseSSL = GetBoolArg("-rpcssl", false);
     asio::io_service io_service;
@@ -40,7 +39,7 @@ Object CallRPC(const string& strMethod, const Array& params)
     context.set_options(ssl::context::no_sslv2);
     asio::ssl::stream<asio::ip::tcp::socket> sslStream(io_service, context);
     SSLIOStreamDevice<asio::ip::tcp> d(sslStream, fUseSSL);
-    iostreams::stream< SSLIOStreamDevice<asio::ip::tcp> > stream(d);
+    iostreams::stream<SSLIOStreamDevice<asio::ip::tcp>> stream(d);
 
     bool fWait = GetBoolArg("-rpcwait", false); // -rpcwait means try until server has started
     do {
@@ -53,19 +52,18 @@ Object CallRPC(const string& strMethod, const Array& params)
     } while (fWait);
 
     // Find credentials to use
-     std::string strRPCUserColonPass;
-     if (mapArgs["-rpcpassword"] == "") {
-         // Try fall back to cookie-based authentication if no password is provided
-         if (!GetAuthCookie(&strRPCUserColonPass)) {
-             throw runtime_error(strprintf(
-                 _("You must set rpcpassword=<password> in the configuration file:\n%s\n"
-                   "If the file does not exist, create it with owner-readable-only file permissions."),
-                     GetConfigFile().string().c_str()));
-
-         }
-     } else {
-         strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
-     }
+    std::string strRPCUserColonPass;
+    if (mapArgs["-rpcpassword"] == "") {
+        // Try fall back to cookie-based authentication if no password is provided
+        if (!GetAuthCookie(&strRPCUserColonPass)) {
+            throw runtime_error(strprintf(
+                _("You must set rpcpassword=<password> in the configuration file:\n%s\n"
+                  "If the file does not exist, create it with owner-readable-only file permissions."),
+                GetConfigFile().string().c_str()));
+        }
+    } else {
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+    }
 
     // HTTP basic authentication
     map<string, string> mapRequestHeaders;
@@ -106,71 +104,72 @@ Object CallRPC(const string& strMethod, const Array& params)
 class CRPCConvertParam
 {
 public:
-    std::string methodName;            // method whose params want conversion
-    int paramIdx;                      // 0-based idx of param to convert
+    std::string methodName; // method whose params want conversion
+    int paramIdx;           // 0-based idx of param to convert
 };
 
 static const CRPCConvertParam vRPCConvertParams[] =
-{
-    { "stop", 0 },
-    { "getaddednodeinfo", 0 },
-    { "setgenerate", 0 },
-    { "setgenerate", 1 },
-    { "sendtoaddress", 1 },
-    { "burn", 0 },
-    { "settxfee", 0 },
-    { "getreceivedbyaddress", 1 },
-    { "getreceivedbyaccount", 1 },
-    { "listreceivedbyaddress", 0 },
-    { "listreceivedbyaddress", 1 },
-    { "listreceivedbyaccount", 0 },
-    { "listreceivedbyaccount", 1 },
-    { "getbalance", 1 },
-    { "getblock", 1 },
-    { "getblockbynumber", 0 },
-    { "getblockbynumber", 1 },
-    { "getblockhash", 0 },
-    { "move", 2 },
-    { "move", 3 },
-    { "sendfrom", 2 },
-    { "sendfrom", 3 },
-    { "listtransactions", 1 },
-    { "listtransactions", 2 },
-    { "listaccounts", 0 },
-    { "walletpassphrase", 1 },
-    { "walletpassphrase", 2 },
-    { "getblocktemplate", 0 },
-    { "listsinceblock", 1 },
-    { "sendmany", 1 },
-    { "sendmany", 2 },
-    { "reservebalance", 0 },
-    { "reservebalance", 1 },
-    { "addmultisigaddress", 0 },
-    { "addmultisigaddress", 1 },
-    { "listunspent", 0 },
-    { "listunspent", 1 },
-    { "listunspent", 2 },
-    { "getrawtransaction", 1 },
-    { "createrawtransaction", 0 },
-    { "createrawtransaction", 1 },
-    { "signrawtransaction", 1 },
-    { "signrawtransaction", 2 },
-    { "keypoolrefill", 0 },
-    { "importprivkey", 2 },
-    { "checkkernel", 0 },
-    { "checkkernel", 1 },
-    { "submitblock", 1 },
+    {
+        {"stop", 0},
+        {"getaddednodeinfo", 0},
+        {"setgenerate", 0},
+        {"setgenerate", 1},
+        {"sendtoaddress", 1},
+        {"burn", 0},
+        {"settxfee", 0},
+        {"getreceivedbyaddress", 1},
+        {"getreceivedbyaccount", 1},
+        {"listreceivedbyaddress", 0},
+        {"listreceivedbyaddress", 1},
+        {"listreceivedbyaccount", 0},
+        {"listreceivedbyaccount", 1},
+        {"getbalance", 1},
+        {"getblock", 1},
+        {"getblockbynumber", 0},
+        {"getblockbynumber", 1},
+        {"getblockhash", 0},
+        {"move", 2},
+        {"move", 3},
+        {"sendfrom", 2},
+        {"sendfrom", 3},
+        {"listtransactions", 1},
+        {"listtransactions", 2},
+        {"listaccounts", 0},
+        {"walletpassphrase", 1},
+        {"walletpassphrase", 2},
+        {"getblocktemplate", 0},
+        {"listsinceblock", 1},
+        {"sendmany", 1},
+        {"sendmany", 2},
+        {"reservebalance", 0},
+        {"reservebalance", 1},
+        {"addmultisigaddress", 0},
+        {"addmultisigaddress", 1},
+        {"listunspent", 0},
+        {"listunspent", 1},
+        {"listunspent", 2},
+        {"getrawtransaction", 1},
+        {"createrawtransaction", 0},
+        {"createrawtransaction", 1},
+        {"signrawtransaction", 1},
+        {"signrawtransaction", 2},
+        {"keypoolrefill", 0},
+        {"importprivkey", 2},
+        {"checkkernel", 0},
+        {"checkkernel", 1},
+        {"submitblock", 1},
 };
 
 class CRPCConvertTable
 {
 private:
-    std::set<std::pair<std::string, int> > members;
+    std::set<std::pair<std::string, int>> members;
 
 public:
     CRPCConvertTable();
 
-    bool convert(const std::string& method, int idx) {
+    bool convert(const std::string& method, int idx)
+    {
         return (members.count(std::make_pair(method, idx)) > 0);
     }
 };
@@ -189,7 +188,7 @@ CRPCConvertTable::CRPCConvertTable()
 static CRPCConvertTable rpcCvtTable;
 
 // Convert strings to command-specific RPC representation
-Array RPCConvertValues(const std::string &strMethod, const std::vector<std::string> &strParams)
+Array RPCConvertValues(const std::string& strMethod, const std::vector<std::string>& strParams)
 {
     Array params;
 
@@ -205,24 +204,21 @@ Array RPCConvertValues(const std::string &strMethod, const std::vector<std::stri
         else {
             Value jVal;
             if (!read_string(strVal, jVal))
-                throw runtime_error(string("Error parsing JSON:")+strVal);
+                throw runtime_error(string("Error parsing JSON:") + strVal);
             params.push_back(jVal);
         }
-
     }
 
     return params;
 }
 
-int CommandLineRPC(int argc, char *argv[])
+int CommandLineRPC(int argc, char* argv[])
 {
     string strPrint;
     int nRet = 0;
-    try
-    {
+    try {
         // Skip switches
-        while (argc > 1 && IsSwitchChar(argv[1][0]))
-        {
+        while (argc > 1 && IsSwitchChar(argv[1][0])) {
             argc--;
             argv++;
         }
@@ -241,17 +237,14 @@ int CommandLineRPC(int argc, char *argv[])
 
         // Parse reply
         const Value& result = find_value(reply, "result");
-        const Value& error  = find_value(reply, "error");
+        const Value& error = find_value(reply, "error");
 
-        if (error.type() != null_type)
-        {
+        if (error.type() != null_type) {
             // Error
             strPrint = "error: " + write_string(error, false);
             int code = find_value(error.get_obj(), "code").get_int();
             nRet = abs(code);
-        }
-        else
-        {
+        } else {
             // Result
             if (result.type() == null_type)
                 strPrint = "";
@@ -260,20 +253,16 @@ int CommandLineRPC(int argc, char *argv[])
             else
                 strPrint = write_string(result, true);
         }
-    }
-    catch (boost::thread_interrupted) {
+    } catch (boost::thread_interrupted) {
         throw;
-    }
-    catch (std::exception& e) {
+    } catch (std::exception& e) {
         strPrint = string("error: ") + e.what();
         nRet = 87;
-    }
-    catch (...) {
+    } catch (...) {
         PrintException(NULL, "CommandLineRPC()");
     }
 
-    if (strPrint != "")
-    {
+    if (strPrint != "") {
         fprintf((nRet == 0 ? stdout : stderr), "%s\n", strPrint.c_str());
     }
     return nRet;

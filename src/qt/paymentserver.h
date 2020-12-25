@@ -51,10 +51,10 @@ public:
 
     PaymentServer(QApplication* parent);
 
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
     // OptionsModel is used for getting proxy settings and display unit
-    void setOptionsModel(OptionsModel *optionsModel);
+    void setOptionsModel(OptionsModel* optionsModel);
 
 signals:
     void receivedURI(QString);
@@ -68,7 +68,7 @@ private slots:
     void handleURIConnection();
 
 private:
-    OptionsModel *optionsModel;
+    OptionsModel* optionsModel;
 };
 
 #endif // PAYMENTSERVER_H

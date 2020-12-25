@@ -8,7 +8,7 @@
 #include "wallet.h"
 
 namespace boost {
-    class thread_group;
+class thread_group;
 } // namespace boost
 
 extern CWallet* pwalletMain;

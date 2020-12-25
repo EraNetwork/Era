@@ -1,8 +1,8 @@
 #ifndef TRANSACTIONFILTERPROXY_H
 #define TRANSACTIONFILTERPROXY_H
 
-#include <QSortFilterProxyModel>
 #include <QDateTime>
+#include <QSortFilterProxyModel>
 
 /** Filter the transaction list according to pre-specified rules. */
 class TransactionFilterProxy : public QSortFilterProxyModel
@@ -10,7 +10,7 @@ class TransactionFilterProxy : public QSortFilterProxyModel
     Q_OBJECT
 
 public:
-    explicit TransactionFilterProxy(QObject *parent = 0);
+    explicit TransactionFilterProxy(QObject* parent = 0);
 
     /** Earliest date that can be represented (far in the past) */
     static const QDateTime MIN_DATE;
@@ -19,10 +19,10 @@ public:
     /** Type filter bit field (all types) */
     static const quint32 ALL_TYPES = 0xFFFFFFFF;
 
-    static quint32 TYPE(int type) { return 1<<type; }
+    static quint32 TYPE(int type) { return 1 << type; }
 
-    void setDateRange(const QDateTime &from, const QDateTime &to);
-    void setAddressPrefix(const QString &addrPrefix);
+    void setDateRange(const QDateTime& from, const QDateTime& to);
+    void setAddressPrefix(const QString& addrPrefix);
     /**
       @note Type filter takes a bit field created with TYPE() or ALL_TYPES
      */
@@ -35,10 +35,10 @@ public:
     /** Set whether to show conflicted transactions. */
     void setShowInactive(bool showInactive);
 
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const;
 
 protected:
-    bool filterAcceptsRow(int source_row, const QModelIndex & source_parent) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
 
 private:
     QDateTime dateFrom;

@@ -11,14 +11,13 @@
 #include <QLocale>
 #include <QMessageBox>
 
-OptionsDialog::OptionsDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::OptionsDialog),
-    model(0),
-    mapper(0),
-    fRestartWarningDisplayed_Proxy(false),
-    fRestartWarningDisplayed_Lang(false),
-    fProxyIpValid(true)
+OptionsDialog::OptionsDialog(QWidget* parent) : QDialog(parent),
+                                                ui(new Ui::OptionsDialog),
+                                                model(0),
+                                                mapper(0),
+                                                fRestartWarningDisplayed_Proxy(false),
+                                                fRestartWarningDisplayed_Lang(false),
+                                                fProxyIpValid(true)
 {
     ui->setupUi(this);
 
@@ -45,13 +44,11 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     /* Display elements init */
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
-    foreach(const QString &langStr, translations.entryList())
-    {
+    foreach (const QString& langStr, translations.entryList()) {
         QLocale locale(langStr);
 
         /** check if the locale name consists of 2 parts (language_country) */
-        if(langStr.contains("_"))
-        {
+        if (langStr.contains("_")) {
 #if QT_VERSION >= 0x040800
             /** display language strings as "native language - native country (locale name)", e.g. "Deutsch - Deutschland (de)" */
             ui->lang->addItem(locale.nativeLanguageName() + QString(" - ") + locale.nativeCountryName() + QString(" (") + langStr + QString(")"), QVariant(langStr));
@@ -59,9 +56,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
             /** display language strings as "language - country (locale name)", e.g. "German - Germany (de)" */
             ui->lang->addItem(QLocale::languageToString(locale.language()) + QString(" - ") + QLocale::countryToString(locale.country()) + QString(" (") + langStr + QString(")"), QVariant(langStr));
 #endif
-        }
-        else
-        {
+        } else {
 #if QT_VERSION >= 0x040800
             /** display language strings as "native language (locale name)", e.g. "Deutsch (de)" */
             ui->lang->addItem(locale.nativeLanguageName() + QString(" (") + langStr + QString(")"), QVariant(langStr));
@@ -84,7 +79,7 @@ OptionsDialog::OptionsDialog(QWidget *parent) :
     /* disable apply button when new data loaded */
     connect(mapper, SIGNAL(currentIndexChanged(int)), this, SLOT(disableApplyButton()));
     /* setup/change UI elements when proxy IP is invalid/valid */
-    connect(this, SIGNAL(proxyIpValid(QValidatedLineEdit *, bool)), this, SLOT(handleProxyIpValid(QValidatedLineEdit *, bool)));
+    connect(this, SIGNAL(proxyIpValid(QValidatedLineEdit*, bool)), this, SLOT(handleProxyIpValid(QValidatedLineEdit*, bool)));
 }
 
 OptionsDialog::~OptionsDialog()
@@ -92,12 +87,11 @@ OptionsDialog::~OptionsDialog()
     delete ui;
 }
 
-void OptionsDialog::setModel(OptionsModel *model)
+void OptionsDialog::setModel(OptionsModel* model)
 {
     this->model = model;
 
-    if(model)
-    {
+    if (model) {
         connect(model, SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
         mapper->setModel(model);
@@ -155,7 +149,7 @@ void OptionsDialog::disableApplyButton()
 void OptionsDialog::enableSaveButtons()
 {
     /* prevent enabling of the save buttons when data modified, if there is an invalid proxy address present */
-    if(fProxyIpValid)
+    if (fProxyIpValid)
         setSaveButtonState(true);
 }
 
@@ -189,8 +183,7 @@ void OptionsDialog::on_applyButton_clicked()
 
 void OptionsDialog::showRestartWarning_Proxy()
 {
-    if(!fRestartWarningDisplayed_Proxy)
-    {
+    if (!fRestartWarningDisplayed_Proxy) {
         QMessageBox::warning(this, tr("Warning"), tr("This setting will take effect after restarting Era."), QMessageBox::Ok);
         fRestartWarningDisplayed_Proxy = true;
     }
@@ -198,8 +191,7 @@ void OptionsDialog::showRestartWarning_Proxy()
 
 void OptionsDialog::showRestartWarning_Lang()
 {
-    if(!fRestartWarningDisplayed_Lang)
-    {
+    if (!fRestartWarningDisplayed_Lang) {
         QMessageBox::warning(this, tr("Warning"), tr("This setting will take effect after restarting Era."), QMessageBox::Ok);
         fRestartWarningDisplayed_Lang = true;
     }
@@ -207,25 +199,21 @@ void OptionsDialog::showRestartWarning_Lang()
 
 void OptionsDialog::updateDisplayUnit()
 {
-    if(model)
-    {
+    if (model) {
         /* Update transactionFee with the current unit */
         ui->transactionFee->setDisplayUnit(model->getDisplayUnit());
     }
 }
 
-void OptionsDialog::handleProxyIpValid(QValidatedLineEdit *object, bool fState)
+void OptionsDialog::handleProxyIpValid(QValidatedLineEdit* object, bool fState)
 {
     // this is used in a check before re-enabling the save buttons
     fProxyIpValid = fState;
 
-    if(fProxyIpValid)
-    {
+    if (fProxyIpValid) {
         enableSaveButtons();
         ui->statusLabel->clear();
-    }
-    else
-    {
+    } else {
         disableSaveButtons();
         object->setValid(fProxyIpValid);
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
@@ -233,12 +221,10 @@ void OptionsDialog::handleProxyIpValid(QValidatedLineEdit *object, bool fState)
     }
 }
 
-bool OptionsDialog::eventFilter(QObject *object, QEvent *event)
+bool OptionsDialog::eventFilter(QObject* object, QEvent* event)
 {
-    if(event->type() == QEvent::FocusOut)
-    {
-        if(object == ui->proxyIp)
-        {
+    if (event->type() == QEvent::FocusOut) {
+        if (object == ui->proxyIp) {
             CService addr;
             /* Check proxyIp for a valid IPv4/IPv6 address and emit the proxyIpValid signal */
             emit proxyIpValid(ui->proxyIp, LookupNumeric(ui->proxyIp->text().toStdString().c_str(), addr));

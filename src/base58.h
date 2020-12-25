@@ -18,11 +18,11 @@
 #include <string>
 #include <vector>
 
-#include "chainparams.h"
+#include "allocators.h"
 #include "bignum.h"
+#include "chainparams.h"
 #include "key.h"
 #include "script.h"
-#include "allocators.h"
 #include "util.h"
 
 static const char* pszBase58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -36,7 +36,7 @@ inline std::string EncodeBase58(const unsigned char* pbegin, const unsigned char
 
     // Convert big endian data to little endian
     // Extra zero at the end make sure bignum will interpret as a positive number
-    std::vector<unsigned char> vchTmp(pend-pbegin+1, 0);
+    std::vector<unsigned char> vchTmp(pend - pbegin + 1, 0);
     reverse_copy(pbegin, pend, vchTmp.begin());
 
     // Convert little endian data to bignum
@@ -50,8 +50,7 @@ inline std::string EncodeBase58(const unsigned char* pbegin, const unsigned char
     str.reserve((pend - pbegin) * 138 / 100 + 1);
     CBigNum dv;
     CBigNum rem;
-    while (bn > bn0)
-    {
+    while (bn > bn0) {
         if (!BN_div(dv.to_bignum(), rem.to_bignum(), bn.to_bignum(), bn58.to_bignum(), pctx))
             throw bignum_error("EncodeBase58 : BN_div failed");
         bn = dv;
@@ -87,11 +86,9 @@ inline bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet)
         psz++;
 
     // Convert big endian string to bignum
-    for (const char* p = psz; *p; p++)
-    {
+    for (const char* p = psz; *p; p++) {
         const char* p1 = strchr(pszBase58, *p);
-        if (p1 == NULL)
-        {
+        if (p1 == NULL) {
             while (isspace(*p))
                 p++;
             if (*p != '\0')
@@ -109,7 +106,7 @@ inline bool DecodeBase58(const char* psz, std::vector<unsigned char>& vchRet)
 
     // Trim off sign byte if present
     if (vchTmp.size() >= 2 && vchTmp.end()[-1] == 0 && vchTmp.end()[-2] >= 0x80)
-        vchTmp.erase(vchTmp.end()-1);
+        vchTmp.erase(vchTmp.end() - 1);
 
     // Restore leading zeros
     int nLeadingZeros = 0;
@@ -130,8 +127,6 @@ inline bool DecodeBase58(const std::string& str, std::vector<unsigned char>& vch
 }
 
 
-
-
 // Encode a byte vector to a base58-encoded string, including checksum
 inline std::string EncodeBase58Check(const std::vector<unsigned char>& vchIn)
 {
@@ -148,18 +143,16 @@ inline bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRe
 {
     if (!DecodeBase58(psz, vchRet))
         return false;
-    if (vchRet.size() < 4)
-    {
+    if (vchRet.size() < 4) {
         vchRet.clear();
         return false;
     }
-    uint256 hash = Hash(vchRet.begin(), vchRet.end()-4);
-    if (memcmp(&hash, &vchRet.end()[-4], 4) != 0)
-    {
+    uint256 hash = Hash(vchRet.begin(), vchRet.end() - 4);
+    if (memcmp(&hash, &vchRet.end()[-4], 4) != 0) {
         vchRet.clear();
         return false;
     }
-    vchRet.resize(vchRet.size()-4);
+    vchRet.resize(vchRet.size() - 4);
     return true;
 }
 
@@ -171,9 +164,6 @@ inline bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>
 }
 
 
-
-
-
 /** Base class for all base58-encoded data */
 class CBase58Data
 {
@@ -182,7 +172,7 @@ protected:
     std::vector<unsigned char> vchVersion;
 
     // the actually encoded data
-    typedef std::vector<unsigned char, zero_after_free_allocator<unsigned char> > vector_uchar;
+    typedef std::vector<unsigned char, zero_after_free_allocator<unsigned char>> vector_uchar;
     vector_uchar vchData;
 
     CBase58Data()
@@ -191,7 +181,7 @@ protected:
         vchData.clear();
     }
 
-    void SetData(const std::vector<unsigned char> &vchVersionIn, const void* pdata, size_t nSize)
+    void SetData(const std::vector<unsigned char>& vchVersionIn, const void* pdata, size_t nSize)
     {
         vchVersion = vchVersionIn;
         vchData.resize(nSize);
@@ -199,7 +189,7 @@ protected:
             memcpy(&vchData[0], pdata, nSize);
     }
 
-    void SetData(const std::vector<unsigned char> &vchVersionIn, const unsigned char *pbegin, const unsigned char *pend)
+    void SetData(const std::vector<unsigned char>& vchVersionIn, const unsigned char* pbegin, const unsigned char* pend)
     {
         SetData(vchVersionIn, (void*)pbegin, pend - pbegin);
     }
@@ -209,8 +199,7 @@ public:
     {
         std::vector<unsigned char> vchTemp;
         DecodeBase58Check(psz, vchTemp);
-        if (vchTemp.size() < nVersionBytes)
-        {
+        if (vchTemp.size() < nVersionBytes) {
             vchData.clear();
             vchVersion.clear();
             return false;
@@ -238,17 +227,17 @@ public:
     int CompareTo(const CBase58Data& b58) const
     {
         if (vchVersion < b58.vchVersion) return -1;
-        if (vchVersion > b58.vchVersion) return  1;
-        if (vchData < b58.vchData)   return -1;
-        if (vchData > b58.vchData)   return  1;
+        if (vchVersion > b58.vchVersion) return 1;
+        if (vchData < b58.vchData) return -1;
+        if (vchData > b58.vchData) return 1;
         return 0;
     }
 
     bool operator==(const CBase58Data& b58) const { return CompareTo(b58) == 0; }
     bool operator<=(const CBase58Data& b58) const { return CompareTo(b58) <= 0; }
     bool operator>=(const CBase58Data& b58) const { return CompareTo(b58) >= 0; }
-    bool operator< (const CBase58Data& b58) const { return CompareTo(b58) <  0; }
-    bool operator> (const CBase58Data& b58) const { return CompareTo(b58) >  0; }
+    bool operator<(const CBase58Data& b58) const { return CompareTo(b58) < 0; }
+    bool operator>(const CBase58Data& b58) const { return CompareTo(b58) > 0; }
 };
 
 /** base58-encoded addresses.
@@ -261,28 +250,31 @@ class CEraAddress;
 class CEraAddressVisitor : public boost::static_visitor<bool>
 {
 private:
-    CEraAddress *addr;
+    CEraAddress* addr;
+
 public:
-    CEraAddressVisitor(CEraAddress *addrIn) : addr(addrIn) { }
-    bool operator()(const CKeyID &id) const;
-    bool operator()(const CScriptID &id) const;
-    bool operator()(const CNoDestination &no) const;
+    CEraAddressVisitor(CEraAddress* addrIn) : addr(addrIn) {}
+    bool operator()(const CKeyID& id) const;
+    bool operator()(const CScriptID& id) const;
+    bool operator()(const CNoDestination& no) const;
 };
 
 class CEraAddress : public CBase58Data
 {
 public:
-    bool Set(const CKeyID &id) {
+    bool Set(const CKeyID& id)
+    {
         SetData(Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS), &id, 20);
         return true;
     }
 
-    bool Set(const CScriptID &id) {
+    bool Set(const CScriptID& id)
+    {
         SetData(Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS), &id, 20);
         return true;
     }
 
-    bool Set(const CTxDestination &dest)
+    bool Set(const CTxDestination& dest)
     {
         return boost::apply_visitor(CEraAddressVisitor(this), dest);
     }
@@ -299,7 +291,7 @@ public:
     {
     }
 
-    CEraAddress(const CTxDestination &dest)
+    CEraAddress(const CTxDestination& dest)
     {
         Set(dest);
     }
@@ -314,7 +306,8 @@ public:
         SetString(pszAddress);
     }
 
-    CTxDestination Get() const {
+    CTxDestination Get() const
+    {
         if (!IsValid())
             return CNoDestination();
         uint160 id;
@@ -327,7 +320,8 @@ public:
             return CNoDestination();
     }
 
-    bool GetKeyID(CKeyID &keyID) const {
+    bool GetKeyID(CKeyID& keyID) const
+    {
         if (!IsValid() || vchVersion != Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS))
             return false;
         uint160 id;
@@ -336,14 +330,15 @@ public:
         return true;
     }
 
-    bool IsScript() const {
+    bool IsScript() const
+    {
         return IsValid() && vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS);
     }
 };
 
-bool inline CEraAddressVisitor::operator()(const CKeyID &id) const         { return addr->Set(id); }
-bool inline CEraAddressVisitor::operator()(const CScriptID &id) const      { return addr->Set(id); }
-bool inline CEraAddressVisitor::operator()(const CNoDestination &id) const { return false; }
+bool inline CEraAddressVisitor::operator()(const CKeyID& id) const { return addr->Set(id); }
+bool inline CEraAddressVisitor::operator()(const CScriptID& id) const { return addr->Set(id); }
+bool inline CEraAddressVisitor::operator()(const CNoDestination& id) const { return false; }
 
 /** A base58-encoded secret key */
 class CEraSecret : public CBase58Data
@@ -392,22 +387,26 @@ public:
 };
 
 
-template<typename K, int Size, CChainParams::Base58Type Type> class CEraExtKeyBase : public CBase58Data
+template <typename K, int Size, CChainParams::Base58Type Type>
+class CEraExtKeyBase : public CBase58Data
 {
 public:
-    void SetKey(const K &key) {
+    void SetKey(const K& key)
+    {
         unsigned char vch[Size];
         key.Encode(vch);
-        SetData(Params().Base58Prefix(Type), vch, vch+Size);
+        SetData(Params().Base58Prefix(Type), vch, vch + Size);
     }
 
-    K GetKey() {
+    K GetKey()
+    {
         K ret;
         ret.Decode(&vchData[0], &vchData[Size]);
         return ret;
     }
 
-    CEraExtKeyBase(const K &key) {
+    CEraExtKeyBase(const K& key)
+    {
         SetKey(key);
     }
 

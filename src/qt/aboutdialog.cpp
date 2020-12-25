@@ -1,20 +1,18 @@
 #include "aboutdialog.h"
-#include "ui_aboutdialog.h"
 #include "clientmodel.h"
+#include "ui_aboutdialog.h"
 
 #include "version.h"
 
-AboutDialog::AboutDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AboutDialog)
+AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent),
+                                            ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
 }
 
-void AboutDialog::setModel(ClientModel *model)
+void AboutDialog::setModel(ClientModel* model)
 {
-    if(model)
-    {
+    if (model) {
         ui->versionLabel->setText(model->formatFullVersion());
     }
 }

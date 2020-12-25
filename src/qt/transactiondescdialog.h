@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-    class TransactionDescDialog;
+class TransactionDescDialog;
 }
 
 QT_BEGIN_NAMESPACE
@@ -17,11 +17,11 @@ class TransactionDescDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TransactionDescDialog(const QModelIndex &idx, QWidget *parent = 0);
+    explicit TransactionDescDialog(const QModelIndex& idx, QWidget* parent = 0);
     ~TransactionDescDialog();
 
 private:
-    Ui::TransactionDescDialog *ui;
+    Ui::TransactionDescDialog* ui;
 };
 
 #endif // TRANSACTIONDESCDIALOG_H

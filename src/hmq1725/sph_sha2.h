@@ -40,22 +40,22 @@
 #ifndef SPH_SHA2_H__
 #define SPH_SHA2_H__
 
-#include <stddef.h>
 #include "sph_types.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 /**
  * Output size (in bits) for SHA-224.
  */
-#define SPH_SIZE_sha224   224
+#define SPH_SIZE_sha224 224
 
 /**
  * Output size (in bits) for SHA-256.
  */
-#define SPH_SIZE_sha256   256
+#define SPH_SIZE_sha256 256
 
 /**
  * This structure is a context for SHA-224 computations: it contains the
@@ -69,12 +69,12 @@ extern "C"{
  */
 typedef struct {
 #ifndef DOXYGEN_IGNORE
-	unsigned char buf[64];    /* first field, for alignment */
-	sph_u32 val[8];
+    unsigned char buf[64]; /* first field, for alignment */
+    sph_u32 val[8];
 #if SPH_64
-	sph_u64 count;
+    sph_u64 count;
 #else
-	sph_u32 count_high, count_low;
+    sph_u32 count_high, count_low;
 #endif
 #endif
 } sph_sha224_context;
@@ -93,7 +93,7 @@ typedef sph_sha224_context sph_sha256_context;
  * @param cc   the SHA-224 context (pointer to
  *             a <code>sph_sha224_context</code>)
  */
-void sph_sha224_init(void *cc);
+void sph_sha224_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -103,7 +103,7 @@ void sph_sha224_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_sha224(void *cc, const void *data, size_t len);
+void sph_sha224(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current SHA-224 computation and output the result into the
@@ -114,7 +114,7 @@ void sph_sha224(void *cc, const void *data, size_t len);
  * @param cc    the SHA-224 context
  * @param dst   the destination buffer
  */
-void sph_sha224_close(void *cc, void *dst);
+void sph_sha224_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -129,7 +129,7 @@ void sph_sha224_close(void *cc, void *dst);
  * @param n     the number of extra bits (0 to 7)
  * @param dst   the destination buffer
  */
-void sph_sha224_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst);
+void sph_sha224_addbits_and_close(void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Apply the SHA-224 compression function on the provided data. The
@@ -150,7 +150,7 @@ void sph_sha224_comp(const sph_u32 msg[16], sph_u32 val[8]);
  * @param cc   the SHA-256 context (pointer to
  *             a <code>sph_sha256_context</code>)
  */
-void sph_sha256_init(void *cc);
+void sph_sha256_init(void* cc);
 
 #ifdef DOXYGEN_IGNORE
 /**
@@ -161,11 +161,11 @@ void sph_sha256_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_sha256(void *cc, const void *data, size_t len);
+void sph_sha256(void* cc, const void* data, size_t len);
 #endif
 
 #ifndef DOXYGEN_IGNORE
-#define sph_sha256   sph_sha224
+#define sph_sha256 sph_sha224
 #endif
 
 /**
@@ -177,7 +177,7 @@ void sph_sha256(void *cc, const void *data, size_t len);
  * @param cc    the SHA-256 context
  * @param dst   the destination buffer
  */
-void sph_sha256_close(void *cc, void *dst);
+void sph_sha256_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -192,7 +192,7 @@ void sph_sha256_close(void *cc, void *dst);
  * @param n     the number of extra bits (0 to 7)
  * @param dst   the destination buffer
  */
-void sph_sha256_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst);
+void sph_sha256_addbits_and_close(void* cc, unsigned ub, unsigned n, void* dst);
 
 #ifdef DOXYGEN_IGNORE
 /**
@@ -206,7 +206,7 @@ void sph_sha256_comp(const sph_u32 msg[16], sph_u32 val[8]);
 #endif
 
 #ifndef DOXYGEN_IGNORE
-#define sph_sha256_comp   sph_sha224_comp
+#define sph_sha256_comp sph_sha224_comp
 #endif
 
 #if SPH_64
@@ -214,12 +214,12 @@ void sph_sha256_comp(const sph_u32 msg[16], sph_u32 val[8]);
 /**
  * Output size (in bits) for SHA-384.
  */
-#define SPH_SIZE_sha384   384
+#define SPH_SIZE_sha384 384
 
 /**
  * Output size (in bits) for SHA-512.
  */
-#define SPH_SIZE_sha512   512
+#define SPH_SIZE_sha512 512
 
 /**
  * This structure is a context for SHA-384 computations: it contains the
@@ -233,9 +233,9 @@ void sph_sha256_comp(const sph_u32 msg[16], sph_u32 val[8]);
  */
 typedef struct {
 #ifndef DOXYGEN_IGNORE
-	unsigned char buf[128];    /* first field, for alignment */
-	sph_u64 val[8];
-	sph_u64 count;
+    unsigned char buf[128]; /* first field, for alignment */
+    sph_u64 val[8];
+    sph_u64 count;
 #endif
 } sph_sha384_context;
 
@@ -245,7 +245,7 @@ typedef struct {
  * @param cc   the SHA-384 context (pointer to
  *             a <code>sph_sha384_context</code>)
  */
-void sph_sha384_init(void *cc);
+void sph_sha384_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -255,7 +255,7 @@ void sph_sha384_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_sha384(void *cc, const void *data, size_t len);
+void sph_sha384(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current SHA-384 computation and output the result into the
@@ -266,7 +266,7 @@ void sph_sha384(void *cc, const void *data, size_t len);
  * @param cc    the SHA-384 context
  * @param dst   the destination buffer
  */
-void sph_sha384_close(void *cc, void *dst);
+void sph_sha384_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -281,7 +281,7 @@ void sph_sha384_close(void *cc, void *dst);
  * @param n     the number of extra bits (0 to 7)
  * @param dst   the destination buffer
  */
-void sph_sha384_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst);
+void sph_sha384_addbits_and_close(void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Apply the SHA-384 compression function on the provided data. The
@@ -310,7 +310,7 @@ typedef sph_sha384_context sph_sha512_context;
  * @param cc   the SHA-512 context (pointer to
  *             a <code>sph_sha512_context</code>)
  */
-void sph_sha512_init(void *cc);
+void sph_sha512_init(void* cc);
 
 #ifdef DOXYGEN_IGNORE
 /**
@@ -321,11 +321,11 @@ void sph_sha512_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_sha512(void *cc, const void *data, size_t len);
+void sph_sha512(void* cc, const void* data, size_t len);
 #endif
 
 #ifndef DOXYGEN_IGNORE
-#define sph_sha512   sph_sha384
+#define sph_sha512 sph_sha384
 #endif
 
 /**
@@ -337,7 +337,7 @@ void sph_sha512(void *cc, const void *data, size_t len);
  * @param cc    the SHA-512 context
  * @param dst   the destination buffer
  */
-void sph_sha512_close(void *cc, void *dst);
+void sph_sha512_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -352,7 +352,7 @@ void sph_sha512_close(void *cc, void *dst);
  * @param n     the number of extra bits (0 to 7)
  * @param dst   the destination buffer
  */
-void sph_sha512_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst);
+void sph_sha512_addbits_and_close(void* cc, unsigned ub, unsigned n, void* dst);
 
 #ifdef DOXYGEN_IGNORE
 /**
@@ -366,7 +366,7 @@ void sph_sha512_comp(const sph_u64 msg[16], sph_u64 val[8]);
 #endif
 
 #ifndef DOXYGEN_IGNORE
-#define sph_sha512_comp   sph_sha384_comp
+#define sph_sha512_comp sph_sha384_comp
 #endif
 
 #endif
@@ -375,4 +375,3 @@ void sph_sha512_comp(const sph_u64 msg[16], sph_u64 val[8]);
 #ifdef __cplusplus
 }
 #endif
-

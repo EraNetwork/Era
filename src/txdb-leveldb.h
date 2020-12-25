@@ -30,8 +30,9 @@
 class CTxDB
 {
 public:
-    CTxDB(const char* pszMode="r+");
-    ~CTxDB() {
+    CTxDB(const char* pszMode = "r+");
+    ~CTxDB()
+    {
         // Note that this is not the same as Close() because it deletes only
         // data scoped to this TxDB object.
         delete activeBatch;
@@ -41,11 +42,11 @@ public:
     void Close();
 
 private:
-    leveldb::DB *pdb;  // Points to the global instance.
+    leveldb::DB* pdb; // Points to the global instance.
 
     // A batch stores up writes and deletes for atomic application. When this
     // field is non-NULL, writes/deletes go there instead of directly to disk.
-    leveldb::WriteBatch *activeBatch;
+    leveldb::WriteBatch* activeBatch;
     leveldb::Options options;
     bool fReadOnly;
     int nVersion;
@@ -54,9 +55,9 @@ protected:
     // Returns true and sets (value,false) if activeBatch contains the given key
     // or leaves value alone and sets deleted = true if activeBatch contains a
     // delete for it.
-    bool ScanBatch(const CDataStream &key, std::string *value, bool *deleted) const;
+    bool ScanBatch(const CDataStream& key, std::string* value, bool* deleted) const;
 
-    template<typename K, typename T>
+    template <typename K, typename T>
     bool Read(const K& key, T& value)
     {
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
@@ -90,14 +91,13 @@ protected:
             CDataStream ssValue(strValue.data(), strValue.data() + strValue.size(),
                                 SER_DISK, CLIENT_VERSION);
             ssValue >> value;
-        }
-        catch (std::exception &e) {
+        } catch (std::exception& e) {
             return false;
         }
         return true;
     }
 
-    template<typename K, typename T>
+    template <typename K, typename T>
     bool Write(const K& key, const T& value)
     {
         if (fReadOnly)
@@ -122,7 +122,7 @@ protected:
         return true;
     }
 
-    template<typename K>
+    template <typename K>
     bool Erase(const K& key)
     {
         if (!pdb)
@@ -141,7 +141,7 @@ protected:
         return (status.ok() || status.IsNotFound());
     }
 
-    template<typename K>
+    template <typename K>
     bool Exists(const K& key)
     {
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
@@ -198,6 +198,7 @@ public:
     bool ReadBestInvalidTrust(CBigNum& bnBestInvalidTrust);
     bool WriteBestInvalidTrust(CBigNum bnBestInvalidTrust);
     bool LoadBlockIndex();
+
 private:
     bool LoadBlockIndexGuts();
 };

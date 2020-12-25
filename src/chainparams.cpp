@@ -25,15 +25,14 @@ struct SeedSpec6 {
 //
 
 // Convert the pnSeeds6 array into usable address objects.
-static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
+static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data, unsigned int count)
 {
     // It'll only connect to one or two seed nodes because once it connects,
     // it'll get a pile of addresses with newer timestamps.
     // Seed nodes are given a random 'last seen time' of between one and two
     // weeks ago.
-    const int64_t nOneWeek = 7*24*60*60;
-    for (unsigned int i = 0; i < count; i++)
-    {
+    const int64_t nOneWeek = 7 * 24 * 60 * 60;
+    for (unsigned int i = 0; i < count; i++) {
         struct in6_addr ip;
         memcpy(&ip, data[i].addr, sizeof(ip));
         CAddress addr(CService(ip, data[i].port));
@@ -42,9 +41,11 @@ static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data
     }
 }
 
-class CMainParams : public CChainParams {
+class CMainParams : public CChainParams
+{
 public:
-    CMainParams() {
+    CMainParams()
+    {
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
@@ -68,11 +69,11 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1520366800;
-        genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 53683;
+        genesis.nTime = 1520366800;
+        genesis.nBits = bnProofOfWorkLimit.GetCompact();
+        genesis.nNonce = 53683;
 
-       /*
+        /*
         Hashed MainNet Genesis Block Output
         block.hashMerkleRoot == 22a2e4e28386bf75759112222b20cf3b889cd60f5e55d7184f8dbdec4d8dc6ff
         block.nTime = 1520366800
@@ -88,9 +89,9 @@ public:
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 34);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 62);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, 83);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x1f)(0x46)(0x20)(0x9f).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x1f)(0x88)(0x95)(0xbf).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 83);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x1f)(0x46)(0x20)(0x9f).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x1f)(0x88)(0x95)(0xbf).convert_to_container<std::vector<unsigned char>>();
 
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
@@ -100,9 +101,11 @@ public:
     virtual const CBlock& GenesisBlock() const { return genesis; }
     virtual Network NetworkID() const { return CChainParams::MAIN; }
 
-    virtual const vector<CAddress>& FixedSeeds() const {
+    virtual const vector<CAddress>& FixedSeeds() const
+    {
         return vFixedSeeds;
     }
+
 protected:
     CBlock genesis;
     vector<CAddress> vFixedSeeds;
@@ -114,9 +117,11 @@ static CMainParams mainParams;
 // Testnet
 //
 
-class CTestNetParams : public CMainParams {
+class CTestNetParams : public CMainParams
+{
 public:
-    CTestNetParams() {
+    CTestNetParams()
+    {
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
@@ -130,17 +135,17 @@ public:
         strDataDir = "testnet";
 
         // Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nBits  = bnProofOfWorkLimit.GetCompact();
+        genesis.nBits = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce = 13731;
 
-       /*
+        /*
         Hashed TestNet Genesis Block Output
         block.hashMerkleRoot == 22a2e4e28386bf75759112222b20cf3b889cd60f5e55d7184f8dbdec4d8dc6ff
         block.nTime = 1520366800
         block.nNonce = 13731
         block.GetHash = 000149d0c0dec3468068735e9f9ccdd6d329ed2f6f60add7459773e502f067c5
        */
-        
+
         hashGenesisBlock = genesis.GetHash();
         assert(hashGenesisBlock == uint256("0x000149d0c0dec3468068735e9f9ccdd6d329ed2f6f60add7459773e502f067c5"));
 
@@ -149,9 +154,9 @@ public:
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 32);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);
-        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1, 145);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x82)(0x3a)(0xa0)(0x03).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x82)(0x3a)(0x06)(0x97).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 145);
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x82)(0x3a)(0xa0)(0x03).convert_to_container<std::vector<unsigned char>>();
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x82)(0x3a)(0x06)(0x97).convert_to_container<std::vector<unsigned char>>();
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
 
@@ -162,33 +167,32 @@ public:
 static CTestNetParams testNetParams;
 
 
+static CChainParams* pCurrentParams = &mainParams;
 
-
-static CChainParams *pCurrentParams = &mainParams;
-
-const CChainParams &Params() {
+const CChainParams& Params()
+{
     return *pCurrentParams;
 }
 
-void SelectParams(CChainParams::Network network) {
+void SelectParams(CChainParams::Network network)
+{
     switch (network) {
-        case CChainParams::MAIN:
-            pCurrentParams = &mainParams;
-            break;
-        case CChainParams::TESTNET:
-            pCurrentParams = &testNetParams;
-            break;
+    case CChainParams::MAIN:
+        pCurrentParams = &mainParams;
+        break;
+    case CChainParams::TESTNET:
+        pCurrentParams = &testNetParams;
+        break;
 
-        default:
-            assert(false && "Unimplemented network");
-            return;
+    default:
+        assert(false && "Unimplemented network");
+        return;
     }
 }
 
-bool SelectParamsFromCommandLine() {
-
+bool SelectParamsFromCommandLine()
+{
     bool fTestNet = GetBoolArg("-testnet", false);
-
 
 
     if (fTestNet) {

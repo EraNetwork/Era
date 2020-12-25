@@ -1,9 +1,9 @@
 #include "blockbrowser.h"
-#include "ui_blockbrowser.h"
-#include "main.h"
 #include "base58.h"
 #include "clientmodel.h"
+#include "main.h"
 #include "txdb.h"
+#include "ui_blockbrowser.h"
 
 
 double GetDifficulty(const CBlockIndex* blockindex);
@@ -20,8 +20,12 @@ const CBlockIndex* getBlockIndex(qint64 height)
 
 std::string getBlockHash(qint64 Height)
 {
-    if(Height > pindexBest->nHeight) { return ""; }
-    if(Height < 0) { return ""; }
+    if (Height > pindexBest->nHeight) {
+        return "";
+    }
+    if (Height < 0) {
+        return "";
+    }
     qint64 desiredheight;
     desiredheight = Height;
     if (desiredheight < 0 || desiredheight > nBestHeight)
@@ -30,7 +34,7 @@ std::string getBlockHash(qint64 Height)
     CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
     while (pblockindex->nHeight > desiredheight)
         pblockindex = pblockindex->pprev;
-    return  pblockindex->GetBlockHash().GetHex(); // pblockindex->phashBlock->GetHex();
+    return pblockindex->GetBlockHash().GetHex(); // pblockindex->phashBlock->GetHex();
 }
 
 qint64 getBlockTime(qint64 Height)
@@ -54,7 +58,7 @@ std::string getBlockMerkle(qint64 Height)
         return 0;
 
     CBlockIndex* pblockindex = mapBlockIndex[hash];
-    return pblockindex->hashMerkleRoot.ToString();//.substr(0,10).c_str();
+    return pblockindex->hashMerkleRoot.ToString(); //.substr(0,10).c_str();
 }
 
 qint64 getBlocknBits(qint64 Height)
@@ -96,8 +100,7 @@ double getTxTotalValue(std::string txid)
 
     double value = 0;
     double buffer = 0;
-    for (unsigned int i = 0; i < tx.vout.size(); i++)
-    {
+    for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut& txout = tx.vout[i];
 
         buffer = value + convertCoins(txout.nValue);
@@ -109,17 +112,17 @@ double getTxTotalValue(std::string txid)
 
 double getMoneySupply(qint64 Height)
 {
-     std::string strHash = getBlockHash(Height);
+    std::string strHash = getBlockHash(Height);
     uint256 hash(strHash);
 
     if (mapBlockIndex.count(hash) == 0)
-    return 0;
+        return 0;
 
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     if (Height == 0)
-    return 0;
-	else
-    return convertCoins(pblockindex->nMoneySupply);
+        return 0;
+    else
+        return convertCoins(pblockindex->nMoneySupply);
 }
 
 double convertCoins(qint64 amount)
@@ -138,17 +141,16 @@ std::string getOutputs(std::string txid)
         return "N/A";
 
     std::string str = "";
-    for (unsigned int i = (tx.IsCoinStake() ? 1 : 0); i < tx.vout.size(); i++)
-    {
+    for (unsigned int i = (tx.IsCoinStake() ? 1 : 0); i < tx.vout.size(); i++) {
         const CTxOut& txout = tx.vout[i];
 
         CTxDestination address;
-        if (!ExtractDestination(txout.scriptPubKey, address) )
+        if (!ExtractDestination(txout.scriptPubKey, address))
             address = CNoDestination();
 
         double buffer = convertCoins(txout.nValue);
         std::string amount = boost::to_string(buffer);
-		str.append(CEraAddress(address).ToString());
+        str.append(CEraAddress(address).ToString());
         str.append(": ");
         str.append(amount);
         str.append(" ERA");
@@ -169,8 +171,7 @@ std::string getInputs(std::string txid)
         return "N/A";
 
     std::string str = "";
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-    {
+    for (unsigned int i = 0; i < tx.vin.size(); i++) {
         uint256 hash;
         const CTxIn& vin = tx.vin[i];
 
@@ -178,10 +179,10 @@ std::string getInputs(std::string txid)
         CTransaction wtxPrev;
         uint256 hashBlock = 0;
         if (!GetTransaction(hash, wtxPrev, hashBlock))
-             return "N/A";
+            return "N/A";
 
         CTxDestination address;
-        if (!ExtractDestination(wtxPrev.vout[vin.prevout.n].scriptPubKey, address) )
+        if (!ExtractDestination(wtxPrev.vout[vin.prevout.n].scriptPubKey, address))
             address = CNoDestination();
 
         double buffer = convertCoins(wtxPrev.vout[vin.prevout.n].nValue);
@@ -203,33 +204,31 @@ double BlockBrowser::getTxFees(std::string txid)
 
     CTransaction tx;
     uint256 hashBlock = 0;
-	CTxDB txdb("r");
+    CTxDB txdb("r");
 
     if (!GetTransaction(hash, tx, hashBlock))
         return convertCoins(MIN_TX_FEE);
 
     MapPrevTx mapInputs;
     map<uint256, CTxIndex> mapUnused;
-	bool fInvalid;
+    bool fInvalid;
 
     if (!tx.FetchInputs(txdb, mapUnused, false, false, mapInputs, fInvalid))
-	      return convertCoins(MIN_TX_FEE);
+        return convertCoins(MIN_TX_FEE);
 
-    qint64 nTxFees = tx.GetValueIn(mapInputs)-tx.GetValueOut();
+    qint64 nTxFees = tx.GetValueIn(mapInputs) - tx.GetValueOut();
 
-    if(tx.IsCoinStake() || tx.IsCoinBase()) {
+    if (tx.IsCoinStake() || tx.IsCoinBase()) {
         ui->feesLabel->setText(QString("Reward:"));
         nTxFees *= -1;
-    }
-    else
+    } else
         ui->feesLabel->setText(QString("Fees:"));
 
     return convertCoins(nTxFees);
 }
 
-BlockBrowser::BlockBrowser(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::BlockBrowser)
+BlockBrowser::BlockBrowser(QWidget* parent) : QDialog(parent),
+                                              ui(new Ui::BlockBrowser)
 {
     ui->setupUi(this);
 
@@ -246,11 +245,9 @@ BlockBrowser::BlockBrowser(QWidget *parent) :
 
 void BlockBrowser::updateExplorer(bool block)
 {
-    if(block)
-	{
-	    qint64 height = ui->heightBox->value();
-        if (height > pindexBest->nHeight)
-        {
+    if (block) {
+        qint64 height = ui->heightBox->value();
+        if (height > pindexBest->nHeight) {
             ui->heightBox->setValue(pindexBest->nHeight);
             height = pindexBest->nHeight;
         }
@@ -267,12 +264,11 @@ void BlockBrowser::updateExplorer(bool block)
         if (pindex->IsProofOfStake()) {
             ui->hashRateLabel->setText("Block Network Stake Weight:");
             ui->diffLabel->setText("PoS Block Difficulty:");
-        }
-        else {
+        } else {
             ui->hashRateLabel->setText("Block Hash Rate:");
             ui->diffLabel->setText("PoW Block Difficulty:");
         }
-            ui->moneySupplyBox->setText(QString::number(getMoneySupply(height), 'f', 6) + " ERA");
+        ui->moneySupplyBox->setText(QString::number(getMoneySupply(height), 'f', 6) + " ERA");
     }
 
     else {
@@ -285,27 +281,26 @@ void BlockBrowser::updateExplorer(bool block)
     }
 }
 
- void BlockBrowser::setTransactionId(const QString &transactionId)
- {
-     ui->txBox->setText(transactionId);
-     ui->txBox->setFocus();
-     updateExplorer(false);
+void BlockBrowser::setTransactionId(const QString& transactionId)
+{
+    ui->txBox->setText(transactionId);
+    ui->txBox->setFocus();
+    updateExplorer(false);
 
-     uint256 hash;
-     hash.SetHex(transactionId.toStdString());
+    uint256 hash;
+    hash.SetHex(transactionId.toStdString());
 
-     CTransaction tx;
-     uint256 hashBlock = 0;
-     if (GetTransaction(hash, tx, hashBlock))
-     {
-         CBlockIndex* pblockindex = mapBlockIndex[hashBlock];
-         if (!pblockindex)
-             ui->heightBox->setValue(nBestHeight);
-         else
-             ui->heightBox->setValue(pblockindex->nHeight);
-         updateExplorer(true);
-     }
- }
+    CTransaction tx;
+    uint256 hashBlock = 0;
+    if (GetTransaction(hash, tx, hashBlock)) {
+        CBlockIndex* pblockindex = mapBlockIndex[hashBlock];
+        if (!pblockindex)
+            ui->heightBox->setValue(nBestHeight);
+        else
+            ui->heightBox->setValue(pblockindex->nHeight);
+        updateExplorer(true);
+    }
+}
 
 void BlockBrowser::txClicked()
 {
@@ -317,7 +312,7 @@ void BlockBrowser::blockClicked()
     updateExplorer(true);
 }
 
-void BlockBrowser::setModel(ClientModel *model)
+void BlockBrowser::setModel(ClientModel* model)
 {
     this->model = model;
 }

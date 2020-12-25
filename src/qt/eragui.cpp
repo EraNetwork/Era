@@ -9,55 +9,54 @@
 
 #include "eragui.h"
 
-#include "transactiontablemodel.h"
-#include "addressbookpage.h"
-#include "sendcoinsdialog.h"
-#include "signverifymessagedialog.h"
-#include "optionsdialog.h"
 #include "aboutdialog.h"
-#include "clientmodel.h"
-#include "walletmodel.h"
-#include "editaddressdialog.h"
-#include "optionsmodel.h"
-#include "transactiondescdialog.h"
+#include "addressbookpage.h"
 #include "addresstablemodel.h"
-#include "transactionview.h"
-#include "overviewpage.h"
+#include "askpassphrasedialog.h"
 #include "blockbrowser.h"
+#include "clientmodel.h"
+#include "editaddressdialog.h"
 #include "eraunits.h"
 #include "guiconstants.h"
-#include "askpassphrasedialog.h"
-#include "notificator.h"
 #include "guiutil.h"
-#include "rpcconsole.h"
-#include "wallet.h"
 #include "init.h"
+#include "notificator.h"
+#include "optionsdialog.h"
+#include "optionsmodel.h"
+#include "overviewpage.h"
+#include "rpcconsole.h"
+#include "sendcoinsdialog.h"
+#include "signverifymessagedialog.h"
+#include "transactiondescdialog.h"
+#include "transactiontablemodel.h"
+#include "transactionview.h"
 #include "ui_interface.h"
+#include "wallet.h"
+#include "walletmodel.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
 #endif
 
-#include <QMenuBar>
-#include <QMenu>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QDragEnterEvent>
+#include <QFileDialog>
 #include <QIcon>
-#include <QVBoxLayout>
-#include <QToolBar>
-#include <QStatusBar>
 #include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QMovie>
 #include <QProgressBar>
 #include <QStackedWidget>
-#include <QDateTime>
-#include <QMovie>
-#include <QFileDialog>
-#include <QDesktopServices>
-#include <QTimer>
-#include <QDragEnterEvent>
-#include <QUrl>
-#include <QMimeData>
+#include <QStatusBar>
 #include <QStyle>
+#include <QTimer>
+#include <QToolBar>
+#include <QUrl>
+#include <QVBoxLayout>
 
 #include <iostream>
 
@@ -65,23 +64,22 @@ extern CWallet* pwalletMain;
 extern int64_t nLastCoinStakeSearchInterval;
 double GetPoSKernelPS();
 
-EraGUI::EraGUI(QWidget *parent):
-    QMainWindow(parent),
-    clientModel(0),
-    walletModel(0),
-    toolbar(0),
-    encryptWalletAction(0),
-    changePassphraseAction(0),
-    unlockWalletAction(0),
-    lockWalletAction(0),
-    aboutQtAction(0),
-    trayIcon(0),
-    notificator(0),
-    rpcConsole(0),
-    prevBlocks(0),
-    nWeight(0)
+EraGUI::EraGUI(QWidget* parent) : QMainWindow(parent),
+                                  clientModel(0),
+                                  walletModel(0),
+                                  toolbar(0),
+                                  encryptWalletAction(0),
+                                  changePassphraseAction(0),
+                                  unlockWalletAction(0),
+                                  lockWalletAction(0),
+                                  aboutQtAction(0),
+                                  trayIcon(0),
+                                  notificator(0),
+                                  rpcConsole(0),
+                                  prevBlocks(0),
+                                  nWeight(0)
 {
-    resize(850+95, 550);
+    resize(850 + 95, 550);
     setWindowTitle(tr("Era") + " - " + tr("Wallet"));
 #ifndef Q_OS_MAC
     qApp->setWindowIcon(QIcon(":icons/era"));
@@ -109,7 +107,7 @@ EraGUI::EraGUI(QWidget *parent):
     overviewPage = new OverviewPage();
 
     transactionsPage = new QWidget(this);
-    QVBoxLayout *vbox = new QVBoxLayout();
+    QVBoxLayout* vbox = new QVBoxLayout();
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
     transactionsPage->setLayout(vbox);
@@ -132,8 +130,8 @@ EraGUI::EraGUI(QWidget *parent):
     centralStackedWidget->addWidget(sendCoinsPage);
     centralStackedWidget->addWidget(blockbrowser);
 
-    QWidget *centralWidget = new QWidget();
-    QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
+    QWidget* centralWidget = new QWidget();
+    QVBoxLayout* centralLayout = new QVBoxLayout(centralWidget);
 #ifndef Q_OS_MAC
     centralLayout->addWidget(appMenuBar);
 #endif
@@ -145,12 +143,12 @@ EraGUI::EraGUI(QWidget *parent):
     statusBar();
 
     // Status bar notification icons
-    QWidget *frameBlocks = new QWidget();
-    frameBlocks->setContentsMargins(0,0,0,0);
+    QWidget* frameBlocks = new QWidget();
+    frameBlocks->setContentsMargins(0, 0, 0, 0);
     frameBlocks->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     frameBlocks->setStyleSheet("QWidget { background: none; margin-bottom: 5px; }");
-    QHBoxLayout *frameBlocksLayout = new QHBoxLayout(frameBlocks);
-    frameBlocksLayout->setContentsMargins(3,0,3,0);
+    QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
+    frameBlocksLayout->setContentsMargins(3, 0, 3, 0);
     frameBlocksLayout->setSpacing(3);
     frameBlocksLayout->setAlignment(Qt::AlignHCenter);
     labelEncryptionIcon = new QLabel();
@@ -168,9 +166,8 @@ EraGUI::EraGUI(QWidget *parent):
     frameBlocksLayout->addStretch();
     toolbar->addWidget(frameBlocks);
 
-    if (GetBoolArg("-staking", true))
-    {
-        QTimer *timerStakingIcon = new QTimer(labelStakingIcon);
+    if (GetBoolArg("-staking", true)) {
+        QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
         connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(updateStakingIcon()));
         timerStakingIcon->start(30 * 1000);
         updateStakingIcon();
@@ -183,14 +180,12 @@ EraGUI::EraGUI(QWidget *parent):
     progressBar->setAlignment(Qt::AlignCenter);
     progressBar->setVisible(false);
 
-    if (!fUseBlackTheme)
-    {
+    if (!fUseBlackTheme) {
         // Override style sheet for progress bar for styles that have a segmented progress bar,
         // as they make the text unreadable (workaround for issue #1071)
         // See https://qt-project.org/doc/qt-4.8/gallery.html
         QString curStyle = qApp->style()->metaObject()->className();
-        if(curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle")
-        {
+        if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
             progressBar->setStyleSheet("QProgressBar { background-color: #e8e8e8; border: 1px solid grey; border-radius: 7px; padding: 1px; text-align: center; } QProgressBar::chunk { background: QLinearGradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #FF8000, stop: 1 orange); border-radius: 7px; margin: 0px; }");
         }
     }
@@ -222,7 +217,7 @@ EraGUI::EraGUI(QWidget *parent):
 
 EraGUI::~EraGUI()
 {
-    if(trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
+    if (trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
         trayIcon->hide();
 #ifdef Q_OS_MAC
     delete appMenuBar;
@@ -231,7 +226,7 @@ EraGUI::~EraGUI()
 
 void EraGUI::createActions()
 {
-    QActionGroup *tabGroup = new QActionGroup(this);
+    QActionGroup* tabGroup = new QActionGroup(this);
 
     overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Dashboard"), this);
     overviewAction->setToolTip(tr("Show general overview of wallet"));
@@ -337,7 +332,7 @@ void EraGUI::createMenuBar()
         appMenuBar = new QMenuBar();
 
     // Configure the menus
-    QMenu *file = appMenuBar->addMenu(tr("&File"));
+    QMenu* file = appMenuBar->addMenu(tr("&File"));
     file->addAction(backupWalletAction);
     file->addAction(exportAction);
     file->addAction(signMessageAction);
@@ -345,7 +340,7 @@ void EraGUI::createMenuBar()
     file->addSeparator();
     file->addAction(quitAction);
 
-    QMenu *settings = appMenuBar->addMenu(tr("&Settings"));
+    QMenu* settings = appMenuBar->addMenu(tr("&Settings"));
     settings->addAction(encryptWalletAction);
     settings->addAction(changePassphraseAction);
     settings->addAction(unlockWalletAction);
@@ -353,7 +348,7 @@ void EraGUI::createMenuBar()
     settings->addSeparator();
     settings->addAction(optionsAction);
 
-    QMenu *help = appMenuBar->addMenu(tr("&Help"));
+    QMenu* help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(openRPCConsoleAction);
     help->addSeparator();
     help->addAction(aboutAction);
@@ -374,8 +369,7 @@ void EraGUI::createToolBars()
     toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
 
-    if (fUseBlackTheme)
-    {
+    if (fUseBlackTheme) {
         QWidget* header = new QWidget();
         header->setMinimumSize(160, 130);
         header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -400,23 +394,21 @@ void EraGUI::createToolBars()
 
     int w = 0;
 
-    foreach(QAction *action, toolbar->actions()) {
+    foreach (QAction* action, toolbar->actions()) {
         w = std::max(w, toolbar->widgetForAction(action)->width());
     }
 
-    foreach(QAction *action, toolbar->actions()) {
+    foreach (QAction* action, toolbar->actions()) {
         toolbar->widgetForAction(action)->setFixedWidth(w);
     }
 }
 
-void EraGUI::setClientModel(ClientModel *clientModel)
+void EraGUI::setClientModel(ClientModel* clientModel)
 {
     this->clientModel = clientModel;
-    if(clientModel)
-    {
+    if (clientModel) {
         // Replace some strings and icons, when using the testnet
-        if(clientModel->isTestNet())
-        {
+        if (clientModel->isTestNet()) {
             setWindowTitle(windowTitle() + QString(" ") + tr("[testnet]"));
 #ifndef Q_OS_MAC
             qApp->setWindowIcon(QIcon(":icons/era_testnet"));
@@ -424,8 +416,7 @@ void EraGUI::setClientModel(ClientModel *clientModel)
 #else
             MacDockIconHandler::instance()->setIcon(QIcon(":icons/era_testnet"));
 #endif
-            if(trayIcon)
-            {
+            if (trayIcon) {
                 trayIcon->setToolTip(tr("Era client") + QString(" ") + tr("[testnet]"));
                 trayIcon->setIcon(QIcon(":/icons/toolbar_testnet"));
                 toggleHideAction->setIcon(QIcon(":/icons/toolbar_testnet"));
@@ -440,7 +431,7 @@ void EraGUI::setClientModel(ClientModel *clientModel)
         connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
         // Receive and report messages from network/worker thread
-        connect(clientModel, SIGNAL(message(QString,QString,bool,unsigned int)), this, SLOT(message(QString,QString,bool,unsigned int)));
+        connect(clientModel, SIGNAL(message(QString, QString, bool, unsigned int)), this, SLOT(message(QString, QString, bool, unsigned int)));
 
         overviewPage->setClientModel(clientModel);
         rpcConsole->setClientModel(clientModel);
@@ -449,13 +440,12 @@ void EraGUI::setClientModel(ClientModel *clientModel)
     }
 }
 
-void EraGUI::setWalletModel(WalletModel *walletModel)
+void EraGUI::setWalletModel(WalletModel* walletModel)
 {
     this->walletModel = walletModel;
-    if(walletModel)
-    {
+    if (walletModel) {
         // Receive and report messages from wallet thread
-        connect(walletModel, SIGNAL(message(QString,QString,bool,unsigned int)), this, SLOT(message(QString,QString,bool,unsigned int)));
+        connect(walletModel, SIGNAL(message(QString, QString, bool, unsigned int)), this, SLOT(message(QString, QString, bool, unsigned int)));
 
         // Put transaction list in tabs
         transactionView->setModel(walletModel);
@@ -469,8 +459,8 @@ void EraGUI::setWalletModel(WalletModel *walletModel)
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
 
         // Balloon pop-up for new transaction
-        connect(walletModel->getTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),
-                this, SLOT(incomingTransaction(QModelIndex,int,int)));
+        connect(walletModel->getTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex, int, int)),
+                this, SLOT(incomingTransaction(QModelIndex, int, int)));
 
         // Ask for passphrase if needed
         connect(walletModel, SIGNAL(requireUnlock()), this, SLOT(unlockWallet()));
@@ -479,7 +469,7 @@ void EraGUI::setWalletModel(WalletModel *walletModel)
 
 void EraGUI::createTrayIcon()
 {
-    QMenu *trayIconMenu;
+    QMenu* trayIconMenu;
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
     trayIconMenu = new QMenu(this);
@@ -491,8 +481,8 @@ void EraGUI::createTrayIcon()
     trayIcon->show();
 #else
     // Note: On Mac, the dock icon is used to provide the tray's functionality.
-    MacDockIconHandler *dockIconHandler = MacDockIconHandler::instance();
-    dockIconHandler->setMainWindow((QMainWindow *)this);
+    MacDockIconHandler* dockIconHandler = MacDockIconHandler::instance();
+    dockIconHandler->setMainWindow((QMainWindow*)this);
     trayIconMenu = dockIconHandler->dockMenu();
 #endif
 
@@ -518,8 +508,7 @@ void EraGUI::createTrayIcon()
 #ifndef Q_OS_MAC
 void EraGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if(reason == QSystemTrayIcon::Trigger)
-    {
+    if (reason == QSystemTrayIcon::Trigger) {
         // Click on system tray icon triggers show/hide of the main window
         toggleHideAction->trigger();
     }
@@ -528,7 +517,7 @@ void EraGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 
 void EraGUI::optionsClicked()
 {
-    if(!clientModel || !clientModel->getOptionsModel())
+    if (!clientModel || !clientModel->getOptionsModel())
         return;
     OptionsDialog dlg;
     dlg.setModel(clientModel->getOptionsModel());
@@ -545,23 +534,27 @@ void EraGUI::aboutClicked()
 void EraGUI::setNumConnections(int count)
 {
     QString icon;
-    switch(count)
-    {
+    switch (count) {
     case 0: icon = fUseBlackTheme ? ":/icons/black/connect_0" : ":/icons/connect_0"; break;
-    case 1: case 2: case 3: icon = fUseBlackTheme ? ":/icons/black/connect_1" : ":/icons/connect_1"; break;
-    case 4: case 5: case 6: icon = fUseBlackTheme ? ":/icons/black/connect_2" : ":/icons/connect_2"; break;
-    case 7: case 8: case 9: icon = fUseBlackTheme ? ":/icons/black/connect_3" : ":/icons/connect_3"; break;
+    case 1:
+    case 2:
+    case 3: icon = fUseBlackTheme ? ":/icons/black/connect_1" : ":/icons/connect_1"; break;
+    case 4:
+    case 5:
+    case 6: icon = fUseBlackTheme ? ":/icons/black/connect_2" : ":/icons/connect_2"; break;
+    case 7:
+    case 8:
+    case 9: icon = fUseBlackTheme ? ":/icons/black/connect_3" : ":/icons/connect_3"; break;
     default: icon = fUseBlackTheme ? ":/icons/black/connect_4" : ":/icons/connect_4"; break;
     }
-    labelConnectionsIcon->setPixmap(QIcon(icon).pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+    labelConnectionsIcon->setPixmap(QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Era network", "", count));
 }
 
 void EraGUI::setNumBlocks(int count)
 {
     // don't show / hide progress bar and its label if we have no connection to the network
-    if (!clientModel || (clientModel->getNumConnections() == 0 && !clientModel->isImporting()))
-    {
+    if (!clientModel || (clientModel->getNumConnections() == 0 && !clientModel->isImporting())) {
         statusBar()->setVisible(false);
 
         return;
@@ -578,8 +571,7 @@ void EraGUI::setNumBlocks(int count)
     tooltip = tr("Processed %1 blocks of transaction history.").arg(count);
 
     // Set icon state: spinning if catching up, tick otherwise
-    if(secs < 90*60)
-    {
+    if (secs < 90 * 60) {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/synced" : ":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
@@ -587,32 +579,23 @@ void EraGUI::setNumBlocks(int count)
 
         progressBarLabel->setVisible(false);
         progressBar->setVisible(false);
-    }
-    else
-    {
+    } else {
         // Represent time from last generated block in human readable text
         QString timeBehindText;
-        const int HOUR_IN_SECONDS = 60*60;
-        const int DAY_IN_SECONDS = 24*60*60;
-        const int WEEK_IN_SECONDS = 7*24*60*60;
+        const int HOUR_IN_SECONDS = 60 * 60;
+        const int DAY_IN_SECONDS = 24 * 60 * 60;
+        const int WEEK_IN_SECONDS = 7 * 24 * 60 * 60;
         const int YEAR_IN_SECONDS = 31556952; // Average length of year in Gregorian calendar
-        if(secs < 2*DAY_IN_SECONDS)
-        {
-            timeBehindText = tr("%n hour(s)","",secs/HOUR_IN_SECONDS);
-        }
-        else if(secs < 2*WEEK_IN_SECONDS)
-        {
-            timeBehindText = tr("%n day(s)","",secs/DAY_IN_SECONDS);
-        }
-        else if(secs < YEAR_IN_SECONDS)
-        {
-            timeBehindText = tr("%n week(s)","",secs/WEEK_IN_SECONDS);
-        }
-        else
-        {
+        if (secs < 2 * DAY_IN_SECONDS) {
+            timeBehindText = tr("%n hour(s)", "", secs / HOUR_IN_SECONDS);
+        } else if (secs < 2 * WEEK_IN_SECONDS) {
+            timeBehindText = tr("%n day(s)", "", secs / DAY_IN_SECONDS);
+        } else if (secs < YEAR_IN_SECONDS) {
+            timeBehindText = tr("%n week(s)", "", secs / WEEK_IN_SECONDS);
+        } else {
             int years = secs / YEAR_IN_SECONDS;
             int remainder = secs % YEAR_IN_SECONDS;
-            timeBehindText = tr("%1 and %2").arg(tr("%n year(s)", "", years)).arg(tr("%n week(s)","", remainder/WEEK_IN_SECONDS));
+            timeBehindText = tr("%1 and %2").arg(tr("%n year(s)", "", years)).arg(tr("%n week(s)", "", remainder / WEEK_IN_SECONDS));
         }
 
         progressBarLabel->setText(tr(clientModel->isImporting() ? "Importing blocks..." : "Synchronizing with network..."));
@@ -625,7 +608,7 @@ void EraGUI::setNumBlocks(int count)
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
         labelBlocksIcon->setMovie(syncIconMovie);
-        if(count != prevBlocks)
+        if (count != prevBlocks)
             syncIconMovie->jumpToNextFrame();
         prevBlocks = count;
 
@@ -647,7 +630,7 @@ void EraGUI::setNumBlocks(int count)
     statusBar()->setVisible(fShowStatusBar);
 }
 
-void EraGUI::message(const QString &title, const QString &message, bool modal, unsigned int style)
+void EraGUI::message(const QString& title, const QString& message, bool modal, unsigned int style)
 {
     QString strTitle = tr("Era") + " - ";
     // Default to information icon
@@ -673,8 +656,7 @@ void EraGUI::message(const QString &title, const QString &message, bool modal, u
     if (style & CClientUIInterface::ICON_ERROR) {
         nMBoxIcon = QMessageBox::Critical;
         nNotifyIcon = Notificator::Critical;
-    }
-    else if (style & CClientUIInterface::ICON_WARNING) {
+    } else if (style & CClientUIInterface::ICON_WARNING) {
         nMBoxIcon = QMessageBox::Warning;
         nNotifyIcon = Notificator::Warning;
     }
@@ -688,22 +670,18 @@ void EraGUI::message(const QString &title, const QString &message, bool modal, u
 
         QMessageBox mBox((QMessageBox::Icon)nMBoxIcon, strTitle, message, buttons);
         mBox.exec();
-    }
-    else
+    } else
         notificator->notify((Notificator::Class)nNotifyIcon, strTitle, message);
 }
 
-void EraGUI::changeEvent(QEvent *e)
+void EraGUI::changeEvent(QEvent* e)
 {
     QMainWindow::changeEvent(e);
 #ifndef Q_OS_MAC // Ignored on Mac
-    if(e->type() == QEvent::WindowStateChange)
-    {
-        if(clientModel && clientModel->getOptionsModel()->getMinimizeToTray())
-        {
-            QWindowStateChangeEvent *wsevt = static_cast<QWindowStateChangeEvent*>(e);
-            if(!(wsevt->oldState() & Qt::WindowMinimized) && isMinimized())
-            {
+    if (e->type() == QEvent::WindowStateChange) {
+        if (clientModel && clientModel->getOptionsModel()->getMinimizeToTray()) {
+            QWindowStateChangeEvent* wsevt = static_cast<QWindowStateChangeEvent*>(e);
+            if (!(wsevt->oldState() & Qt::WindowMinimized) && isMinimized()) {
                 QTimer::singleShot(0, this, SLOT(hide()));
                 e->ignore();
             }
@@ -712,14 +690,12 @@ void EraGUI::changeEvent(QEvent *e)
 #endif
 }
 
-void EraGUI::closeEvent(QCloseEvent *event)
+void EraGUI::closeEvent(QCloseEvent* event)
 {
-    if(clientModel)
-    {
+    if (clientModel) {
 #ifndef Q_OS_MAC // Ignored on Mac
-        if(!clientModel->getOptionsModel()->getMinimizeToTray() &&
-           !clientModel->getOptionsModel()->getMinimizeOnClose())
-        {
+        if (!clientModel->getOptionsModel()->getMinimizeToTray() &&
+            !clientModel->getOptionsModel()->getMinimizeOnClose()) {
             qApp->quit();
         }
 #endif
@@ -727,52 +703,57 @@ void EraGUI::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void EraGUI::askFee(qint64 nFeeRequired, bool *payFee)
+void EraGUI::askFee(qint64 nFeeRequired, bool* payFee)
 {
     if (!clientModel || !clientModel->getOptionsModel())
         return;
 
     QString strMessage = tr("This transaction is over the size limit. You can still send it for a fee of %1, "
-        "which goes to the nodes that process your transaction and helps to support the network. "
-        "Do you want to pay the fee?").arg(EraUnits::formatWithUnit(clientModel->getOptionsModel()->getDisplayUnit(), nFeeRequired));
+                            "which goes to the nodes that process your transaction and helps to support the network. "
+                            "Do you want to pay the fee?")
+                             .arg(EraUnits::formatWithUnit(clientModel->getOptionsModel()->getDisplayUnit(), nFeeRequired));
     QMessageBox::StandardButton retval = QMessageBox::question(
-          this, tr("Confirm transaction fee"), strMessage,
-          QMessageBox::Yes|QMessageBox::Cancel, QMessageBox::Yes);
+        this, tr("Confirm transaction fee"), strMessage,
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
     *payFee = (retval == QMessageBox::Yes);
 }
 
-void EraGUI::incomingTransaction(const QModelIndex & parent, int start, int end)
+void EraGUI::incomingTransaction(const QModelIndex& parent, int start, int end)
 {
-    if(!walletModel || !clientModel)
+    if (!walletModel || !clientModel)
         return;
-    TransactionTableModel *ttm = walletModel->getTransactionTableModel();
+    TransactionTableModel* ttm = walletModel->getTransactionTableModel();
     qint64 amount = ttm->index(start, TransactionTableModel::Amount, parent)
-                    .data(Qt::EditRole).toULongLong();
-    if(!clientModel->inInitialBlockDownload())
-    {
+                        .data(Qt::EditRole)
+                        .toULongLong();
+    if (!clientModel->inInitialBlockDownload()) {
         // On new transaction, make an info balloon
         // Unless the initial block download is in progress, to prevent balloon-spam
         QString date = ttm->index(start, TransactionTableModel::Date, parent)
-                        .data().toString();
+                           .data()
+                           .toString();
         QString type = ttm->index(start, TransactionTableModel::Type, parent)
-                        .data().toString();
+                           .data()
+                           .toString();
         QString address = ttm->index(start, TransactionTableModel::ToAddress, parent)
-                        .data().toString();
+                              .data()
+                              .toString();
         QIcon icon = qvariant_cast<QIcon>(ttm->index(start,
-                            TransactionTableModel::ToAddress, parent)
-                        .data(Qt::DecorationRole));
+                                                     TransactionTableModel::ToAddress, parent)
+                                              .data(Qt::DecorationRole));
 
         notificator->notify(Notificator::Information,
-                            (amount)<0 ? tr("Sent transaction") :
-                                         tr("Incoming transaction"),
-                              tr("Date: %1\n"
-                                 "Amount: %2\n"
-                                 "Type: %3\n"
-                                 "Address: %4\n")
-                              .arg(date)
-                              .arg(EraUnits::formatWithUnit(walletModel->getOptionsModel()->getDisplayUnit(), amount, true))
-                              .arg(type)
-                              .arg(address), icon);
+                            (amount) < 0 ? tr("Sent transaction") :
+                                           tr("Incoming transaction"),
+                            tr("Date: %1\n"
+                               "Amount: %2\n"
+                               "Type: %3\n"
+                               "Address: %4\n")
+                                .arg(date)
+                                .arg(EraUnits::formatWithUnit(walletModel->getOptionsModel()->getDisplayUnit(), amount, true))
+                                .arg(type)
+                                .arg(address),
+                            icon);
     }
 }
 
@@ -839,7 +820,7 @@ void EraGUI::gotoSignMessageTab(QString addr)
     // call show() in showTab_SM()
     signVerifyMessageDialog->showTab_SM(true);
 
-    if(!addr.isEmpty())
+    if (!addr.isEmpty())
         signVerifyMessageDialog->setAddress_SM(addr);
 }
 
@@ -848,25 +829,23 @@ void EraGUI::gotoVerifyMessageTab(QString addr)
     // call show() in showTab_VM()
     signVerifyMessageDialog->showTab_VM(true);
 
-    if(!addr.isEmpty())
+    if (!addr.isEmpty())
         signVerifyMessageDialog->setAddress_VM(addr);
 }
 
-void EraGUI::dragEnterEvent(QDragEnterEvent *event)
+void EraGUI::dragEnterEvent(QDragEnterEvent* event)
 {
     // Accept only URIs
-    if(event->mimeData()->hasUrls())
+    if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
 
-void EraGUI::dropEvent(QDropEvent *event)
+void EraGUI::dropEvent(QDropEvent* event)
 {
-    if(event->mimeData()->hasUrls())
-    {
+    if (event->mimeData()->hasUrls()) {
         int nValidUrisFound = 0;
         QList<QUrl> uris = event->mimeData()->urls();
-        foreach(const QUrl &uri, uris)
-        {
+        foreach (const QUrl& uri, uris) {
             if (sendCoinsPage->handleURI(uri.toString()))
                 nValidUrisFound++;
         }
@@ -884,21 +863,18 @@ void EraGUI::dropEvent(QDropEvent *event)
 void EraGUI::handleURI(QString strURI)
 {
     // URI has to be valid
-    if (sendCoinsPage->handleURI(strURI))
-    {
+    if (sendCoinsPage->handleURI(strURI)) {
         showNormalIfMinimized();
         gotoSendCoinsPage();
-    }
-    else
+    } else
         notificator->notify(Notificator::Warning, tr("URI handling"), tr("URI can not be parsed! This can be caused by an invalid Era address or malformed URI parameters."));
 }
 
 void EraGUI::setEncryptionStatus(int status)
 {
-    switch(status)
-    {
+    switch (status) {
     case WalletModel::Unencrypted:
-        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_open" : ":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_open" : ":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>not encrypted</b>"));
         changePassphraseAction->setEnabled(false);
         unlockWalletAction->setVisible(false);
@@ -906,7 +882,7 @@ void EraGUI::setEncryptionStatus(int status)
         encryptWalletAction->setEnabled(true);
         break;
     case WalletModel::Unlocked:
-        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_open" : ":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_open" : ":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
         changePassphraseAction->setEnabled(true);
         unlockWalletAction->setVisible(false);
@@ -914,7 +890,7 @@ void EraGUI::setEncryptionStatus(int status)
         encryptWalletAction->setEnabled(false); // TODO: decrypt currently not supported
         break;
     case WalletModel::Locked:
-        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_closed" : ":/icons/lock_closed").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelEncryptionIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/lock_closed" : ":/icons/lock_closed").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         labelEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>locked</b>"));
         changePassphraseAction->setEnabled(true);
         unlockWalletAction->setVisible(true);
@@ -926,7 +902,7 @@ void EraGUI::setEncryptionStatus(int status)
 
 void EraGUI::encryptWallet()
 {
-    if(!walletModel)
+    if (!walletModel)
         return;
 
     AskPassphraseDialog dlg(AskPassphraseDialog::Encrypt, this);
@@ -940,8 +916,8 @@ void EraGUI::backupWallet()
 {
     QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
     QString filename = QFileDialog::getSaveFileName(this, tr("Backup Wallet"), saveDir, tr("Wallet Data (*.dat)"));
-    if(!filename.isEmpty()) {
-        if(!walletModel->backupWallet(filename)) {
+    if (!filename.isEmpty()) {
+        if (!walletModel->backupWallet(filename)) {
             QMessageBox::warning(this, tr("Backup Failed"), tr("There was an error trying to save the wallet data to the new location."));
         }
     }
@@ -956,13 +932,13 @@ void EraGUI::changePassphrase()
 
 void EraGUI::unlockWallet()
 {
-    if(!walletModel)
+    if (!walletModel)
         return;
     // Unlock wallet when requested by wallet model
-    if(walletModel->getEncryptionStatus() == WalletModel::Locked)
-    {
+    if (walletModel->getEncryptionStatus() == WalletModel::Locked) {
         AskPassphraseDialog::Mode mode = sender() == unlockWalletAction ?
-              AskPassphraseDialog::UnlockStaking : AskPassphraseDialog::Unlock;
+                                             AskPassphraseDialog::UnlockStaking :
+                                             AskPassphraseDialog::Unlock;
         AskPassphraseDialog dlg(mode, this);
         dlg.setModel(walletModel);
         dlg.exec();
@@ -971,7 +947,7 @@ void EraGUI::unlockWallet()
 
 void EraGUI::lockWallet()
 {
-    if(!walletModel)
+    if (!walletModel)
         return;
 
     walletModel->setWalletLocked(true);
@@ -980,22 +956,16 @@ void EraGUI::lockWallet()
 void EraGUI::showNormalIfMinimized(bool fToggleHidden)
 {
     // activateWindow() (sometimes) helps with keyboard focus on Windows
-    if (isHidden())
-    {
+    if (isHidden()) {
         show();
         activateWindow();
-    }
-    else if (isMinimized())
-    {
+    } else if (isMinimized()) {
         showNormal();
         activateWindow();
-    }
-    else if (GUIUtil::isObscured(this))
-    {
+    } else if (GUIUtil::isObscured(this)) {
         raise();
         activateWindow();
-    }
-    else if(fToggleHidden)
+    } else if (fToggleHidden)
         hide();
 }
 
@@ -1024,39 +994,29 @@ void EraGUI::updateStakingIcon()
 {
     updateWeight();
 
-    if (nLastCoinStakeSearchInterval && nWeight)
-    {
+    if (nLastCoinStakeSearchInterval && nWeight) {
         uint64_t nWeight = this->nWeight;
         uint64_t nNetworkWeight = GetPoSKernelPS();
         unsigned nEstimateTime = GetTargetSpacing(nBestHeight) * nNetworkWeight / nWeight;
 
         QString text;
-        if (nEstimateTime < 60)
-        {
+        if (nEstimateTime < 60) {
             text = tr("%n second(s)", "", nEstimateTime);
-        }
-        else if (nEstimateTime < 60*60)
-        {
-            text = tr("%n minute(s)", "", nEstimateTime/60);
-        }
-        else if (nEstimateTime < 24*60*60)
-        {
-            text = tr("%n hour(s)", "", nEstimateTime/(60*60));
-        }
-        else
-        {
-            text = tr("%n day(s)", "", nEstimateTime/(60*60*24));
+        } else if (nEstimateTime < 60 * 60) {
+            text = tr("%n minute(s)", "", nEstimateTime / 60);
+        } else if (nEstimateTime < 24 * 60 * 60) {
+            text = tr("%n hour(s)", "", nEstimateTime / (60 * 60));
+        } else {
+            text = tr("%n day(s)", "", nEstimateTime / (60 * 60 * 24));
         }
 
         nWeight /= COIN;
         nNetworkWeight /= COIN;
 
-        labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_on" : ":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+        labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_on" : ":/icons/staking_on").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         labelStakingIcon->setToolTip(tr("Staking.<br>Your weight is %1<br>Network weight is %2<br>Expected time to earn reward is %3").arg(nWeight).arg(nNetworkWeight).arg(text));
-    }
-    else
-    {
-        labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_off" : ":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+    } else {
+        labelStakingIcon->setPixmap(QIcon(fUseBlackTheme ? ":/icons/black/staking_off" : ":/icons/staking_off").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         if (pwalletMain && pwalletMain->IsLocked())
             labelStakingIcon->setToolTip(tr("Not staking because wallet is locked"));
         else if (vNodes.empty())

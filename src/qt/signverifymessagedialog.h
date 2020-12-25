@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-    class SignVerifyMessageDialog;
+class SignVerifyMessageDialog;
 }
 class WalletModel;
 
@@ -13,10 +13,10 @@ class SignVerifyMessageDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SignVerifyMessageDialog(QWidget *parent = 0);
+    explicit SignVerifyMessageDialog(QWidget* parent = 0);
     ~SignVerifyMessageDialog();
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
     void setAddress_SM(QString address);
     void setAddress_VM(QString address);
 
@@ -24,11 +24,11 @@ public:
     void showTab_VM(bool fShow);
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 private:
-    Ui::SignVerifyMessageDialog *ui;
-    WalletModel *model;
+    Ui::SignVerifyMessageDialog* ui;
+    WalletModel* model;
 
 private slots:
     /* sign message */

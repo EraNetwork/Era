@@ -11,18 +11,18 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <winsock2.h>
 #include <mswsock.h>
+#include <winsock2.h>
 #include <ws2tcpip.h>
 #else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/fcntl.h>
 #include <arpa/inet.h>
-#include <netdb.h>
-#include <net/if.h>
-#include <netinet/in.h>
 #include <ifaddrs.h>
+#include <net/if.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/fcntl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 typedef u_int SOCKET;
@@ -30,22 +30,22 @@ typedef u_int SOCKET;
 
 
 #ifdef WIN32
-#define MSG_NOSIGNAL        0
-#define MSG_DONTWAIT        0
+#define MSG_NOSIGNAL 0
+#define MSG_DONTWAIT 0
 typedef int socklen_t;
 #else
 #include "errno.h"
-#define WSAGetLastError()   errno
-#define WSAEINVAL           EINVAL
-#define WSAEALREADY         EALREADY
-#define WSAEWOULDBLOCK      EWOULDBLOCK
-#define WSAEMSGSIZE         EMSGSIZE
-#define WSAEINTR            EINTR
-#define WSAEINPROGRESS      EINPROGRESS
-#define WSAEADDRINUSE       EADDRINUSE
-#define WSAENOTSOCK         EBADF
-#define INVALID_SOCKET      (SOCKET)(~0)
-#define SOCKET_ERROR        -1
+#define WSAGetLastError() errno
+#define WSAEINVAL EINVAL
+#define WSAEALREADY EALREADY
+#define WSAEWOULDBLOCK EWOULDBLOCK
+#define WSAEMSGSIZE EMSGSIZE
+#define WSAEINTR EINTR
+#define WSAEINPROGRESS EINPROGRESS
+#define WSAEADDRINUSE EADDRINUSE
+#define WSAENOTSOCK EBADF
+#define INVALID_SOCKET (SOCKET)(~0)
+#define SOCKET_ERROR -1
 #endif
 
 inline int myclosesocket(SOCKET& hSocket)
@@ -60,7 +60,7 @@ inline int myclosesocket(SOCKET& hSocket)
     hSocket = INVALID_SOCKET;
     return ret;
 }
-#define closesocket(s)      myclosesocket(s)
+#define closesocket(s) myclosesocket(s)
 
 
 #endif

@@ -5,10 +5,10 @@
 #ifndef ERA_CORE_H
 #define ERA_CORE_H
 
-#include "uint256.h"
-#include "serialize.h"
-#include "util.h"
 #include "script.h"
+#include "serialize.h"
+#include "uint256.h"
+#include "util.h"
 
 #include <stdio.h>
 
@@ -22,10 +22,18 @@ public:
     unsigned int n;
 
     COutPoint() { SetNull(); }
-    COutPoint(uint256 hashIn, unsigned int nIn) { hash = hashIn; n = nIn; }
-    IMPLEMENT_SERIALIZE( READWRITE(FLATDATA(*this)); )
-    void SetNull() { hash = 0; n = (unsigned int) -1; }
-    bool IsNull() const { return (hash == 0 && n == (unsigned int) -1); }
+    COutPoint(uint256 hashIn, unsigned int nIn)
+    {
+        hash = hashIn;
+        n = nIn;
+    }
+    IMPLEMENT_SERIALIZE(READWRITE(FLATDATA(*this));)
+    void SetNull()
+    {
+        hash = 0;
+        n = (unsigned int)-1;
+    }
+    bool IsNull() const { return (hash == 0 && n == (unsigned int)-1); }
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
     {
@@ -44,7 +52,7 @@ public:
 
     std::string ToString() const
     {
-        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10), n);
+        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0, 10), n);
     }
 };
 
@@ -56,9 +64,17 @@ public:
     unsigned int n;
 
     CInPoint() { SetNull(); }
-    CInPoint(CTransaction* ptxIn, unsigned int nIn) { ptx = ptxIn; n = nIn; }
-    void SetNull() { ptx = NULL; n = (unsigned int) -1; }
-    bool IsNull() const { return (ptx == NULL && n == (unsigned int) -1); }
+    CInPoint(CTransaction* ptxIn, unsigned int nIn)
+    {
+        ptx = ptxIn;
+        n = nIn;
+    }
+    void SetNull()
+    {
+        ptx = NULL;
+        n = (unsigned int)-1;
+    }
+    bool IsNull() const { return (ptx == NULL && n == (unsigned int)-1); }
 };
 
 /** An input of a transaction.  It contains the location of the previous
@@ -77,26 +93,24 @@ public:
         nSequence = std::numeric_limits<unsigned int>::max();
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn = CScript(), unsigned int nSequenceIn = std::numeric_limits<unsigned int>::max())
     {
         prevout = prevoutIn;
         scriptSig = scriptSigIn;
         nSequence = nSequenceIn;
     }
 
-    CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
+    CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn = CScript(), unsigned int nSequenceIn = std::numeric_limits<unsigned int>::max())
     {
         prevout = COutPoint(hashPrevTx, nOut);
         scriptSig = scriptSigIn;
         nSequence = nSequenceIn;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         READWRITE(prevout);
         READWRITE(scriptSig);
-        READWRITE(nSequence);
-    )
+        READWRITE(nSequence);)
 
     bool IsFinal() const
     {
@@ -105,7 +119,7 @@ public:
 
     friend bool operator==(const CTxIn& a, const CTxIn& b)
     {
-        return (a.prevout   == b.prevout &&
+        return (a.prevout == b.prevout &&
                 a.scriptSig == b.scriptSig &&
                 a.nSequence == b.nSequence);
     }
@@ -123,15 +137,13 @@ public:
         if (prevout.IsNull())
             str += strprintf(", coinbase %s", HexStr(scriptSig));
         else
-            str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0,24));
+            str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0, 24));
         if (nSequence != std::numeric_limits<unsigned int>::max())
             str += strprintf(", nSequence=%u", nSequence);
         str += ")";
         return str;
     }
 };
-
-
 
 
 /** An output of a transaction.  It contains the public key that the next input
@@ -154,11 +166,9 @@ public:
         scriptPubKey = scriptPubKeyIn;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+    IMPLEMENT_SERIALIZE(
         READWRITE(nValue);
-        READWRITE(scriptPubKey);
-    )
+        READWRITE(scriptPubKey);)
 
     void SetNull()
     {
@@ -195,7 +205,7 @@ public:
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
-        return (a.nValue       == b.nValue &&
+        return (a.nValue == b.nValue &&
                 a.scriptPubKey == b.scriptPubKey);
     }
 

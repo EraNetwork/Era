@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "ui_interface.h"
 #include "init.h"
+#include "ui_interface.h"
 
 #include <string>
 
@@ -36,7 +36,7 @@ static bool noui_ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCa
     return true;
 }
 
-static void noui_InitMessage(const std::string &message)
+static void noui_InitMessage(const std::string& message)
 {
     LogPrintf("init message: %s\n", message);
 }

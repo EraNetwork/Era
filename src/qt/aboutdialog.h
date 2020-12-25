@@ -4,7 +4,7 @@
 #include <QDialog>
 
 namespace Ui {
-    class AboutDialog;
+class AboutDialog;
 }
 class ClientModel;
 
@@ -14,12 +14,13 @@ class AboutDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AboutDialog(QWidget *parent = 0);
+    explicit AboutDialog(QWidget* parent = 0);
     ~AboutDialog();
 
-    void setModel(ClientModel *model);
+    void setModel(ClientModel* model);
+
 private:
-    Ui::AboutDialog *ui;
+    Ui::AboutDialog* ui;
 
 private slots:
     void on_buttonBox_accepted();

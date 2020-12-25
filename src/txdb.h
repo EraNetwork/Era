@@ -8,4 +8,4 @@
 
 #include "txdb-leveldb.h"
 
-#endif  // ERA_TXDB_H
+#endif // ERA_TXDB_H

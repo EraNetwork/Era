@@ -36,37 +36,37 @@
 #ifndef SPH_SHABAL_H__
 #define SPH_SHABAL_H__
 
-#include <stddef.h>
 #include "sph_types.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 
 /**
  * Output size (in bits) for Shabal-192.
  */
-#define SPH_SIZE_shabal192   192
+#define SPH_SIZE_shabal192 192
 
 /**
  * Output size (in bits) for Shabal-224.
  */
-#define SPH_SIZE_shabal224   224
+#define SPH_SIZE_shabal224 224
 
 /**
  * Output size (in bits) for Shabal-256.
  */
-#define SPH_SIZE_shabal256   256
+#define SPH_SIZE_shabal256 256
 
 /**
  * Output size (in bits) for Shabal-384.
  */
-#define SPH_SIZE_shabal384   384
+#define SPH_SIZE_shabal384 384
 
 /**
  * Output size (in bits) for Shabal-512.
  */
-#define SPH_SIZE_shabal512   512
+#define SPH_SIZE_shabal512 512
 
 /**
  * This structure is a context for Shabal computations: it contains the
@@ -80,10 +80,10 @@ extern "C"{
  */
 typedef struct {
 #ifndef DOXYGEN_IGNORE
-	unsigned char buf[64];    /* first field, for alignment */
-	size_t ptr;
-	sph_u32 A[12], B[16], C[16];
-	sph_u32 Whigh, Wlow;
+    unsigned char buf[64]; /* first field, for alignment */
+    size_t ptr;
+    sph_u32 A[12], B[16], C[16];
+    sph_u32 Whigh, Wlow;
 #endif
 } sph_shabal_context;
 
@@ -118,7 +118,7 @@ typedef sph_shabal_context sph_shabal512_context;
  * @param cc   the Shabal-192 context (pointer to a
  *             <code>sph_shabal192_context</code>)
  */
-void sph_shabal192_init(void *cc);
+void sph_shabal192_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -128,7 +128,7 @@ void sph_shabal192_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_shabal192(void *cc, const void *data, size_t len);
+void sph_shabal192(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current Shabal-192 computation and output the result into
@@ -139,7 +139,7 @@ void sph_shabal192(void *cc, const void *data, size_t len);
  * @param cc    the Shabal-192 context
  * @param dst   the destination buffer
  */
-void sph_shabal192_close(void *cc, void *dst);
+void sph_shabal192_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -155,7 +155,7 @@ void sph_shabal192_close(void *cc, void *dst);
  * @param dst   the destination buffer
  */
 void sph_shabal192_addbits_and_close(
-	void *cc, unsigned ub, unsigned n, void *dst);
+    void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Initialize a Shabal-224 context. This process performs no memory allocation.
@@ -163,7 +163,7 @@ void sph_shabal192_addbits_and_close(
  * @param cc   the Shabal-224 context (pointer to a
  *             <code>sph_shabal224_context</code>)
  */
-void sph_shabal224_init(void *cc);
+void sph_shabal224_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -173,7 +173,7 @@ void sph_shabal224_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_shabal224(void *cc, const void *data, size_t len);
+void sph_shabal224(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current Shabal-224 computation and output the result into
@@ -184,7 +184,7 @@ void sph_shabal224(void *cc, const void *data, size_t len);
  * @param cc    the Shabal-224 context
  * @param dst   the destination buffer
  */
-void sph_shabal224_close(void *cc, void *dst);
+void sph_shabal224_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -200,7 +200,7 @@ void sph_shabal224_close(void *cc, void *dst);
  * @param dst   the destination buffer
  */
 void sph_shabal224_addbits_and_close(
-	void *cc, unsigned ub, unsigned n, void *dst);
+    void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Initialize a Shabal-256 context. This process performs no memory allocation.
@@ -208,7 +208,7 @@ void sph_shabal224_addbits_and_close(
  * @param cc   the Shabal-256 context (pointer to a
  *             <code>sph_shabal256_context</code>)
  */
-void sph_shabal256_init(void *cc);
+void sph_shabal256_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -218,7 +218,7 @@ void sph_shabal256_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_shabal256(void *cc, const void *data, size_t len);
+void sph_shabal256(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current Shabal-256 computation and output the result into
@@ -229,7 +229,7 @@ void sph_shabal256(void *cc, const void *data, size_t len);
  * @param cc    the Shabal-256 context
  * @param dst   the destination buffer
  */
-void sph_shabal256_close(void *cc, void *dst);
+void sph_shabal256_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -245,7 +245,7 @@ void sph_shabal256_close(void *cc, void *dst);
  * @param dst   the destination buffer
  */
 void sph_shabal256_addbits_and_close(
-	void *cc, unsigned ub, unsigned n, void *dst);
+    void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Initialize a Shabal-384 context. This process performs no memory allocation.
@@ -253,7 +253,7 @@ void sph_shabal256_addbits_and_close(
  * @param cc   the Shabal-384 context (pointer to a
  *             <code>sph_shabal384_context</code>)
  */
-void sph_shabal384_init(void *cc);
+void sph_shabal384_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -263,7 +263,7 @@ void sph_shabal384_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_shabal384(void *cc, const void *data, size_t len);
+void sph_shabal384(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current Shabal-384 computation and output the result into
@@ -274,7 +274,7 @@ void sph_shabal384(void *cc, const void *data, size_t len);
  * @param cc    the Shabal-384 context
  * @param dst   the destination buffer
  */
-void sph_shabal384_close(void *cc, void *dst);
+void sph_shabal384_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -290,7 +290,7 @@ void sph_shabal384_close(void *cc, void *dst);
  * @param dst   the destination buffer
  */
 void sph_shabal384_addbits_and_close(
-	void *cc, unsigned ub, unsigned n, void *dst);
+    void* cc, unsigned ub, unsigned n, void* dst);
 
 /**
  * Initialize a Shabal-512 context. This process performs no memory allocation.
@@ -298,7 +298,7 @@ void sph_shabal384_addbits_and_close(
  * @param cc   the Shabal-512 context (pointer to a
  *             <code>sph_shabal512_context</code>)
  */
-void sph_shabal512_init(void *cc);
+void sph_shabal512_init(void* cc);
 
 /**
  * Process some data bytes. It is acceptable that <code>len</code> is zero
@@ -308,7 +308,7 @@ void sph_shabal512_init(void *cc);
  * @param data   the input data
  * @param len    the input data length (in bytes)
  */
-void sph_shabal512(void *cc, const void *data, size_t len);
+void sph_shabal512(void* cc, const void* data, size_t len);
 
 /**
  * Terminate the current Shabal-512 computation and output the result into
@@ -319,7 +319,7 @@ void sph_shabal512(void *cc, const void *data, size_t len);
  * @param cc    the Shabal-512 context
  * @param dst   the destination buffer
  */
-void sph_shabal512_close(void *cc, void *dst);
+void sph_shabal512_close(void* cc, void* dst);
 
 /**
  * Add a few additional bits (0 to 7) to the current computation, then
@@ -335,10 +335,10 @@ void sph_shabal512_close(void *cc, void *dst);
  * @param dst   the destination buffer
  */
 void sph_shabal512_addbits_and_close(
-	void *cc, unsigned ub, unsigned n, void *dst);
+    void* cc, unsigned ub, unsigned n, void* dst);
 
 #ifdef __cplusplus
 }
-#endif	
-	
+#endif
+
 #endif

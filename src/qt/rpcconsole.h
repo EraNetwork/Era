@@ -4,20 +4,20 @@
 #include <QDialog>
 
 namespace Ui {
-    class RPCConsole;
+class RPCConsole;
 }
 class ClientModel;
 
 /** Local Era RPC console. */
-class RPCConsole: public QDialog
+class RPCConsole : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit RPCConsole(QWidget *parent = 0);
+    explicit RPCConsole(QWidget* parent = 0);
     ~RPCConsole();
 
-    void setClientModel(ClientModel *model);
+    void setClientModel(ClientModel* model);
 
     enum MessageClass {
         MC_ERROR,
@@ -28,7 +28,7 @@ public:
     };
 
 protected:
-    virtual bool eventFilter(QObject* obj, QEvent *event);
+    virtual bool eventFilter(QObject* obj, QEvent* event);
 
 private slots:
     void on_lineEdit_returnPressed();
@@ -48,7 +48,7 @@ private slots:
 
 public slots:
     void clear();
-    void message(int category, const QString &message, bool html = false);
+    void message(int category, const QString& message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set number of blocks shown in the UI */
@@ -60,14 +60,14 @@ public slots:
 signals:
     // For RPC command executor
     void stopExecutor();
-    void cmdRequest(const QString &command);
+    void cmdRequest(const QString& command);
 
 private:
     static QString FormatBytes(quint64 bytes);
     void setTrafficGraphRange(int mins);
 
-    Ui::RPCConsole *ui;
-    ClientModel *clientModel;
+    Ui::RPCConsole* ui;
+    ClientModel* clientModel;
     QStringList history;
     int historyPtr;
 

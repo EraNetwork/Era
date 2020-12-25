@@ -4,7 +4,8 @@
 // Temporary for migration to opaque uint160/256
 #include "uint256.h"
 
-class arith_uint256 : public uint256 {
+class arith_uint256 : public uint256
+{
 public:
     arith_uint256() {}
     arith_uint256(const base_uint<256>& b) : uint256(b) {}

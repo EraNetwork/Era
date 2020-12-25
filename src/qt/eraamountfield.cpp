@@ -1,17 +1,16 @@
 #include "eraamountfield.h"
 
-#include "qvaluecombobox.h"
 #include "eraunits.h"
 #include "guiconstants.h"
+#include "qvaluecombobox.h"
 
+#include <QApplication>
+#include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QDoubleSpinBox>
-#include <QApplication>
 #include <qmath.h> // for qPow()
 
-EraAmountField::EraAmountField(QWidget *parent):
-        QWidget(parent), amount(0), currentUnit(-1)
+EraAmountField::EraAmountField(QWidget* parent) : QWidget(parent), amount(0), currentUnit(-1)
 {
     amount = new QDoubleSpinBox(this);
     amount->setLocale(QLocale::c());
@@ -20,13 +19,13 @@ EraAmountField::EraAmountField(QWidget *parent):
     amount->setMaximumWidth(170);
     amount->setSingleStep(0.001);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    QHBoxLayout* layout = new QHBoxLayout(this);
     layout->addWidget(amount);
     unit = new QValueComboBox(this);
     unit->setModel(new EraUnits(this));
     layout->addWidget(unit);
     layout->addStretch(1);
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     setLayout(layout);
 
@@ -41,7 +40,7 @@ EraAmountField::EraAmountField(QWidget *parent):
     unitChanged(unit->currentIndex());
 }
 
-void EraAmountField::setText(const QString &text)
+void EraAmountField::setText(const QString& text)
 {
     if (text.isEmpty())
         amount->clear();
@@ -84,18 +83,14 @@ QString EraAmountField::text() const
         return amount->text();
 }
 
-bool EraAmountField::eventFilter(QObject *object, QEvent *event)
+bool EraAmountField::eventFilter(QObject* object, QEvent* event)
 {
-    if (event->type() == QEvent::FocusIn)
-    {
+    if (event->type() == QEvent::FocusIn) {
         // Clear invalid flag on focus
         setValid(true);
-    }
-    else if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
-    {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Comma)
-        {
+    } else if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Comma) {
             // Translate a comma into a period
             QKeyEvent periodKeyEvent(event->type(), Qt::Key_Period, keyEvent->modifiers(), ".", keyEvent->isAutoRepeat(), keyEvent->count());
             qApp->sendEvent(object, &periodKeyEvent);
@@ -105,18 +100,17 @@ bool EraAmountField::eventFilter(QObject *object, QEvent *event)
     return QWidget::eventFilter(object, event);
 }
 
-QWidget *EraAmountField::setupTabChain(QWidget *prev)
+QWidget* EraAmountField::setupTabChain(QWidget* prev)
 {
     QWidget::setTabOrder(prev, amount);
     return amount;
 }
 
-qint64 EraAmountField::value(bool *valid_out) const
+qint64 EraAmountField::value(bool* valid_out) const
 {
     qint64 val_out = 0;
     bool valid = EraUnits::parse(currentUnit, text(), &val_out);
-    if(valid_out)
-    {
+    if (valid_out) {
         *valid_out = valid;
     }
     return val_out;
@@ -145,13 +139,10 @@ void EraAmountField::unitChanged(int idx)
     amount->setDecimals(EraUnits::decimals(currentUnit));
     amount->setMaximum(qPow(10, EraUnits::amountDigits(currentUnit)) - qPow(10, -amount->decimals()));
 
-    if(valid)
-    {
+    if (valid) {
         // If value was valid, re-place it in the widget with the new unit
         setValue(currentValue);
-    }
-    else
-    {
+    } else {
         // If current value is invalid, just clear field
         setText("");
     }

@@ -12,8 +12,8 @@
 #include "timedata.h"
 #include "util.h"
 
-#include <boost/foreach.hpp>
 #include "json/json_spirit_value.h"
+#include <boost/foreach.hpp>
 
 using namespace json_spirit;
 using namespace std;
@@ -40,7 +40,7 @@ Value ping(const Array& params, bool fHelp)
 
     // Request that each node send a ping during next message processing pass
     LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pNode, vNodes) {
+    BOOST_FOREACH (CNode* pNode, vNodes) {
         pNode->fPingQueued = true;
     }
 
@@ -53,7 +53,7 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
 
     LOCK(cs_vNodes);
     vstats.reserve(vNodes.size());
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    BOOST_FOREACH (CNode* pnode, vNodes) {
         CNodeStats stats;
         pnode->copyStats(stats);
         vstats.push_back(stats);
@@ -72,7 +72,7 @@ Value getpeerinfo(const Array& params, bool fHelp)
 
     Array ret;
 
-    BOOST_FOREACH(const CNodeStats& stats, vstats) {
+    BOOST_FOREACH (const CNodeStats& stats, vstats) {
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
@@ -114,8 +114,7 @@ Value addnode(const Array& params, bool fHelp)
 
     string strNode = params[0].get_str();
 
-    if (strCommand == "onetry")
-    {
+    if (strCommand == "onetry") {
         CAddress addr;
         ConnectNode(addr, strNode.c_str());
         return Value::null;
@@ -123,18 +122,15 @@ Value addnode(const Array& params, bool fHelp)
 
     LOCK(cs_vAddedNodes);
     vector<string>::iterator it = vAddedNodes.begin();
-    for(; it != vAddedNodes.end(); it++)
+    for (; it != vAddedNodes.end(); it++)
         if (strNode == *it)
             break;
 
-    if (strCommand == "add")
-    {
+    if (strCommand == "add") {
         if (it != vAddedNodes.end())
             throw JSONRPCError(RPC_CLIENT_NODE_ALREADY_ADDED, "Error: Node already added");
         vAddedNodes.push_back(strNode);
-    }
-    else if(strCommand == "remove")
-    {
+    } else if (strCommand == "remove") {
         if (it == vAddedNodes.end())
             throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
         vAddedNodes.erase(it);
@@ -156,19 +152,15 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
     bool fDns = params[0].get_bool();
 
     list<string> laddedNodes(0);
-    if (params.size() == 1)
-    {
+    if (params.size() == 1) {
         LOCK(cs_vAddedNodes);
-        BOOST_FOREACH(string& strAddNode, vAddedNodes)
+        BOOST_FOREACH (string& strAddNode, vAddedNodes)
             laddedNodes.push_back(strAddNode);
-    }
-    else
-    {
+    } else {
         string strNode = params[1].get_str();
         LOCK(cs_vAddedNodes);
-        BOOST_FOREACH(string& strAddNode, vAddedNodes)
-            if (strAddNode == strNode)
-            {
+        BOOST_FOREACH (string& strAddNode, vAddedNodes)
+            if (strAddNode == strNode) {
                 laddedNodes.push_back(strAddNode);
                 break;
             }
@@ -176,24 +168,21 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
             throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
     }
 
-    if (!fDns)
-    {
+    if (!fDns) {
         Object ret;
-        BOOST_FOREACH(string& strAddNode, laddedNodes)
+        BOOST_FOREACH (string& strAddNode, laddedNodes)
             ret.push_back(Pair("addednode", strAddNode));
         return ret;
     }
 
     Array ret;
 
-    list<pair<string, vector<CService> > > laddedAddreses(0);
-    BOOST_FOREACH(string& strAddNode, laddedNodes)
-    {
+    list<pair<string, vector<CService>>> laddedAddreses(0);
+    BOOST_FOREACH (string& strAddNode, laddedNodes) {
         vector<CService> vservNode(0);
-        if(Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))
+        if (Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))
             laddedAddreses.push_back(make_pair(strAddNode, vservNode));
-        else
-        {
+        else {
             Object obj;
             obj.push_back(Pair("addednode", strAddNode));
             obj.push_back(Pair("connected", false));
@@ -203,21 +192,18 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
     }
 
     LOCK(cs_vNodes);
-    for (list<pair<string, vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++)
-    {
+    for (list<pair<string, vector<CService>>>::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++) {
         Object obj;
         obj.push_back(Pair("addednode", it->first));
 
         Array addresses;
         bool fConnected = false;
-        BOOST_FOREACH(CService& addrNode, it->second)
-        {
+        BOOST_FOREACH (CService& addrNode, it->second) {
             bool fFound = false;
             Object node;
             node.push_back(Pair("address", addrNode.ToString()));
-            BOOST_FOREACH(CNode* pnode, vNodes)
-                if (pnode->addr == addrNode)
-                {
+            BOOST_FOREACH (CNode* pnode, vNodes)
+                if (pnode->addr == addrNode) {
                     fFound = true;
                     fConnected = true;
                     node.push_back(Pair("connected", pnode->fInbound ? "inbound" : "outbound"));

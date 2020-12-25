@@ -4,17 +4,17 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef __cplusplus
-# error This header can only be compiled as C++.
+#error This header can only be compiled as C++.
 #endif
 
 #ifndef __INCLUDED_PROTOCOL_H__
 #define __INCLUDED_PROTOCOL_H__
 
 #include "chainparams.h"
-#include "serialize.h"
 #include "netbase.h"
-#include <string>
+#include "serialize.h"
 #include "uint256.h"
+#include <string>
 
 /** Message header.
  * (4) message start.
@@ -24,104 +24,97 @@
  */
 class CMessageHeader
 {
-    public:
-        CMessageHeader();
-        CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn);
+public:
+    CMessageHeader();
+    CMessageHeader(const char* pszCommand, unsigned int nMessageSizeIn);
 
-        std::string GetCommand() const;
-        bool IsValid() const;
+    std::string GetCommand() const;
+    bool IsValid() const;
 
-        IMPLEMENT_SERIALIZE
-            (
-             READWRITE(FLATDATA(pchMessageStart));
-             READWRITE(FLATDATA(pchCommand));
-             READWRITE(nMessageSize);
-             READWRITE(nChecksum);
-            )
+    IMPLEMENT_SERIALIZE(
+        READWRITE(FLATDATA(pchMessageStart));
+        READWRITE(FLATDATA(pchCommand));
+        READWRITE(nMessageSize);
+        READWRITE(nChecksum);)
 
     // TODO: make private (improves encapsulation)
-    public:
-        enum {
-            COMMAND_SIZE=12,
-            MESSAGE_SIZE_SIZE=sizeof(int),
-            CHECKSUM_SIZE=sizeof(int),
+public:
+    enum {
+        COMMAND_SIZE = 12,
+        MESSAGE_SIZE_SIZE = sizeof(int),
+        CHECKSUM_SIZE = sizeof(int),
 
-            MESSAGE_SIZE_OFFSET=MESSAGE_START_SIZE+COMMAND_SIZE,
-            CHECKSUM_OFFSET=MESSAGE_SIZE_OFFSET+MESSAGE_SIZE_SIZE,
-            HEADER_SIZE=MESSAGE_START_SIZE+COMMAND_SIZE+MESSAGE_SIZE_SIZE+CHECKSUM_SIZE
-        };
-        char pchMessageStart[MESSAGE_START_SIZE];
-        char pchCommand[COMMAND_SIZE];
-        unsigned int nMessageSize;
-        unsigned int nChecksum;
+        MESSAGE_SIZE_OFFSET = MESSAGE_START_SIZE + COMMAND_SIZE,
+        CHECKSUM_OFFSET = MESSAGE_SIZE_OFFSET + MESSAGE_SIZE_SIZE,
+        HEADER_SIZE = MESSAGE_START_SIZE + COMMAND_SIZE + MESSAGE_SIZE_SIZE + CHECKSUM_SIZE
+    };
+    char pchMessageStart[MESSAGE_START_SIZE];
+    char pchCommand[COMMAND_SIZE];
+    unsigned int nMessageSize;
+    unsigned int nChecksum;
 };
 
 /** nServices flags */
-enum
-{
+enum {
     NODE_NETWORK = (1 << 0),
 };
 
 /** A CService with information about it as peer */
 class CAddress : public CService
 {
-    public:
-        CAddress();
-        explicit CAddress(CService ipIn, uint64_t nServicesIn=NODE_NETWORK);
+public:
+    CAddress();
+    explicit CAddress(CService ipIn, uint64_t nServicesIn = NODE_NETWORK);
 
-        void Init();
+    void Init();
 
-        IMPLEMENT_SERIALIZE
-            (
-             CAddress* pthis = const_cast<CAddress*>(this);
-             CService* pip = (CService*)pthis;
-             if (fRead)
-                 pthis->Init();
-             if (nType & SER_DISK)
-                 READWRITE(nVersion);
-             if ((nType & SER_DISK) ||
-                 (nVersion >= CADDR_TIME_VERSION && !(nType & SER_GETHASH)))
-                 READWRITE(nTime);
-             READWRITE(nServices);
-             READWRITE(*pip);
-            )
+    IMPLEMENT_SERIALIZE(
+        CAddress* pthis = const_cast<CAddress*>(this);
+        CService* pip = (CService*)pthis;
+        if (fRead)
+            pthis->Init();
+        if (nType & SER_DISK)
+            READWRITE(nVersion);
+        if ((nType & SER_DISK) ||
+            (nVersion >= CADDR_TIME_VERSION && !(nType & SER_GETHASH)))
+            READWRITE(nTime);
+        READWRITE(nServices);
+        READWRITE(*pip);)
 
 
     // TODO: make private (improves encapsulation)
-    public:
-        uint64_t nServices;
+public:
+    uint64_t nServices;
 
-        // disk and network only
-        unsigned int nTime;
+    // disk and network only
+    unsigned int nTime;
 
-        // memory only
-        int64_t nLastTry;
+    // memory only
+    int64_t nLastTry;
 };
 
 /** inv message data */
 class CInv
 {
-    public:
-        CInv();
-        CInv(int typeIn, const uint256& hashIn);
-        CInv(const std::string& strType, const uint256& hashIn);
+public:
+    CInv();
+    CInv(int typeIn, const uint256& hashIn);
+    CInv(const std::string& strType, const uint256& hashIn);
 
-        IMPLEMENT_SERIALIZE
-        (
-            READWRITE(type);
-            READWRITE(hash);
-        )
+    IMPLEMENT_SERIALIZE(
+        READWRITE(type);
+        READWRITE(hash);)
 
-        friend bool operator<(const CInv& a, const CInv& b);
+    friend bool operator<(const CInv& a, const CInv& b);
 
-        bool IsKnownType() const;
-        const char* GetCommand() const;
-        std::string ToString() const;
+    bool IsKnownType() const;
+    const char* GetCommand() const;
+    std::string ToString() const;
 
     // TODO: make private (improves encapsulation)
-    public:
-        int type;
-        uint256 hash;
+public:
+    int type;
+    uint256 hash;
 };
 
 #endif // __INCLUDED_PROTOCOL_H__

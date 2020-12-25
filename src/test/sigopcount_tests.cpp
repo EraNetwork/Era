@@ -1,9 +1,9 @@
-#include <vector>
-#include <boost/test/unit_test.hpp>
 #include <boost/foreach.hpp>
+#include <boost/test/unit_test.hpp>
+#include <vector>
 
-#include "script.h"
 #include "key.h"
+#include "script.h"
 
 using namespace std;
 
@@ -38,8 +38,7 @@ BOOST_AUTO_TEST_CASE(GetSigOpCount)
     BOOST_CHECK_EQUAL(p2sh.GetSigOpCount(scriptSig), 3);
 
     std::vector<CPubKey> keys;
-    for (int i = 0; i < 3; i++)
-    {
+    for (int i = 0; i < 3; i++) {
         CKey k;
         k.MakeNewKey(true);
         keys.push_back(k.GetPubKey());
