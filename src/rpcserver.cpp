@@ -20,7 +20,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ip/v6_only.hpp>
 #include <boost/asio/ssl.hpp>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
@@ -28,12 +28,6 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
 #include <list>
-
-#if BOOST_VERSION >= 107000
-#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s)->get_executor().context())
-#else
-#define GET_IO_SERVICE(s) ((s).get_io_service())
-#endif
 
 using namespace std;
 using namespace boost;
@@ -432,6 +426,13 @@ static void RPCAcceptHandler(boost::shared_ptr< basic_socket_acceptor<Protocol> 
 /**
  * Sets up I/O resources to accept and handle a new connection.
  */
+
+#if BOOST_VERSION >= 106600
+#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s)->get_executor().context())
+#else
+#define GET_IO_SERVICE(s) ((s).get_io_service())
+#endif
+
 template <typename Protocol>
 static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol> > acceptor,
                    ssl::context& context,
@@ -450,7 +451,7 @@ static void RPCListen(boost::shared_ptr< basic_socket_acceptor<Protocol> > accep
                 conn,
                 boost::asio::placeholders::error));
 }
-
+#undef GET_IO_SERVICE
 
 /**
  * Accept and handle incoming connection.
@@ -626,7 +627,7 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
                                         boost::shared_ptr<deadline_timer>(new deadline_timer(*rpc_io_service))));
     }
     deadlineTimers[name]->expires_from_now(posix_time::seconds(nSeconds));
-    deadlineTimers[name]->async_wait(boost::bind(RPCRunHandler, _1, func));
+    deadlineTimers[name]->async_wait(boost::bind(RPCRunHandler, boost::placeholders::_1, func));
 }
 
 class JSONRequest

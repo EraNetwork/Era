@@ -22,12 +22,6 @@
 #include "json/json_spirit_utils.h"
 #include "json/json_spirit_writer_template.h"
 
-#if BOOST_VERSION >= 107000
-#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())
-#else
-#define GET_IO_SERVICE(s) ((s).get_io_service())
-#endif
-
 // HTTP status codes
 enum HTTPStatusCode
 {
@@ -81,6 +75,13 @@ enum RPCErrorCode
 //
 // IOStream device that speaks SSL but can also speak non-SSL
 //
+
+#if BOOST_VERSION >= 106600
+#define GET_IO_SERVICE(s) ((boost::asio::io_context&)(s).get_executor().context())
+#else
+#define GET_IO_SERVICE(s) ((s).get_io_service())
+#endif
+
 template <typename Protocol>
 class SSLIOStreamDevice : public boost::iostreams::device<boost::iostreams::bidirectional> {
 public:
@@ -130,6 +131,7 @@ private:
     bool fUseSSL;
     boost::asio::ssl::stream<typename Protocol::socket>& stream;
 };
+#undef GET_IO_SERVICE
 
 std::string HTTPPost(const std::string& strMsg, const std::map<std::string,std::string>& mapRequestHeaders);
 std::string HTTPReply(int nStatus, const std::string& strMsg, bool keepalive);
